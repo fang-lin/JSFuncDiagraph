@@ -4,8 +4,10 @@
  */
 
 (function () {
-    function Expression(literal) {
+    function Expression(literal, color) {
         this.literal = literal;
+        this.color = color || '#333';
+        console.log(this.color);
         this.functional();
     }
 
