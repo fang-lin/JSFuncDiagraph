@@ -13,11 +13,54 @@ $(function () {
     var diagraph = new JSFuncDiagraph($('#canvas'), [$body.width(), $body.height()]);
     diagraph
 //        .pushExpression(new Expression('y = Math.tan(x)'));
-//        .pushExpression(new Expression('y = Math.sin(x)'))
+        .pushExpression(new Expression('y = Math.sin(x)'))
+        .pushExpression(new Expression('y = Math.cos(x)'))
+        .pushExpression(new Expression('y = -Math.sin(x)'))
 //        .pushExpression(new Expression('y = 1/x'))
-        .pushExpression(new Expression('y = 100/Math.pow(x,2) - 1/Math.pow(x,4)'));
+//        .pushExpression(new Expression('y = 2/x'))
+//        .pushExpression(new Expression('y = 3/x'))
+//        .pushExpression(new Expression('y = 4/x'))
+//        .pushExpression(new Expression('y = 5/x'))
+//        .pushExpression(new Expression('y = 6/x'))
+//        .pushExpression(new Expression('y = 7/x'))
+//        .pushExpression(new Expression('y = 8/x'))
+//        .pushExpression(new Expression('y = 9/x'))
+//        .pushExpression(new Expression('y = 10/x'))
+//        .pushExpression(new Expression('y = 11/x'))
+//        .pushExpression(new Expression('y = 12/x'))
+//        .pushExpression(new Expression('y = 13/x'))
+//        .pushExpression(new Expression('y = 14/x'))
+//        .pushExpression(new Expression('y = 15/x'))
+//        .pushExpression(new Expression('y = 16/x'))
+//        .pushExpression(new Expression('y = 17/x'))
+//        .pushExpression(new Expression('y = 18/x'))
+//        .pushExpression(new Expression('y = 19/x'))
+//        .pushExpression(new Expression('y = 20/x'))
+//        .pushExpression(new Expression('y = -1/x'))
+//        .pushExpression(new Expression('y = -2/x'))
+//        .pushExpression(new Expression('y = -3/x'))
+//        .pushExpression(new Expression('y = -4/x'))
+//        .pushExpression(new Expression('y = -5/x'))
+//        .pushExpression(new Expression('y = -6/x'))
+//        .pushExpression(new Expression('y = -7/x'))
+//        .pushExpression(new Expression('y = -8/x'))
+//        .pushExpression(new Expression('y = -9/x'))
+//        .pushExpression(new Expression('y = -10/x'))
+//        .pushExpression(new Expression('y = -11/x'))
+//        .pushExpression(new Expression('y = -12/x'))
+//        .pushExpression(new Expression('y = -13/x'))
+//        .pushExpression(new Expression('y = -14/x'))
+//        .pushExpression(new Expression('y = -15/x'))
+//        .pushExpression(new Expression('y = -16/x'))
+//        .pushExpression(new Expression('y = -17/x'))
+//        .pushExpression(new Expression('y = -18/x'))
+//        .pushExpression(new Expression('y = -19/x'))
+//        .pushExpression(new Expression('y = -20/x'))
+//        .pushExpression(new Expression('y = 100/Math.pow(x,2) - 1/Math.pow(x,4)'));
+//        .pushExpression(new Expression('y = Math.log(x)*1000'));
 //        .pushExpression(new Expression('y = 10/Math.pow(x,2) - 1/Math.pow(x,4)'));
-//        .pushExpression(new Expression('y = Math.atan(x)'))
+        .pushExpression(new Expression('y = Math.tan(x)'))
+        .pushExpression(new Expression('y = -Math.tan(x)'))
 //        .pushExpression(new Expression('y = 1/(1-Math.pow(Math.E, x/(1-x)))'));
 
     diagraph.redraw([$body.width(), $body.height()]);
@@ -26,7 +69,11 @@ $(function () {
         diagraph.redraw([$body.width(), $body.height()]);
     }, 200));
 
-    $(window).on('mousewheel', _.throttle(function (event) {
+    var redraw = _.throttle(function () {
+        diagraph.redraw();
+    }, 200);
+
+    $(window).on('mousewheel', function (event) {
         var ratio = 1.5;
         if (event.deltaY > 0) {
             // zoom in
@@ -35,9 +82,8 @@ $(function () {
             // zoom out
             diagraph.zoom(diagraph.zoom() / ratio);
         }
-        diagraph.redraw();
-    }, 200));
-
+        redraw();
+    });
 
     var drag = {
         client: [],
@@ -72,3 +118,6 @@ $(function () {
 
 
 });
+
+var y;
+console.dir(Number.isFinite(y));

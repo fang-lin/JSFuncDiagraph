@@ -17,8 +17,8 @@
 
     JSFuncDiagraph.MIN_DELTA = 1e-7;
     JSFuncDiagraph.CHORD_FIELD = [.9, 1.1];
-    JSFuncDiagraph.MAX_ITERATION = 10000000;
-    JSFuncDiagraph.MAX_DELTA_RECOUNT = 1000;
+    JSFuncDiagraph.MAX_ITERATION = 10000000000000;
+    JSFuncDiagraph.MAX_DELTA_RECOUNT = 10;
     JSFuncDiagraph.ZOOM_RANGE = [2, 200];
 
     var _prototype_ = JSFuncDiagraph.prototype;
@@ -96,67 +96,63 @@
         var MAX_DELTA = (CHORD_FIELD[0] + CHORD_FIELD[1]) / 2 / zoom;
 
         context.fillStyle = color;
-        var x = range[0];
-        var y;
-
+        var x = range[0], y;
         var dx = MAX_DELTA;
 
-        // compute first value
-        // TODO: 计算出的 y 可能不是一个存在于值域内的实数，因此当 y 不可用时，需要使用较大的 delta 跳至正确的定义域值域
-        y = func(x);
-        var px = offset[0] + x * zoom;
-        var py = offset[1] - y * zoom;
+        var px, py;
 
         var maxDeltaRecount = 0;
         var pointCount = 0;
         var iterationCount = 0;
         var startTime = new Date();
         do {
-            var deltaRecount = 0;
-            do {
-                var dy = y - func(x + dx);
-                var chord = Math.pow(Math.pow(dx, 2) + Math.pow(dy, 2), .5);
+            if (Number.isFinite(y)) {
+                var deltaRecount = 0;
+                do {
+                    var dy = y - func(x + dx);
+                    var chord = Math.pow(Math.pow(dx, 2) + Math.pow(dy, 2), .5);
 
-                if (chord * zoom > CHORD_FIELD[0] && chord * zoom < CHORD_FIELD[1]) {
-                    break;
-                } else {
-                    dx = Math.cos(Math.atan(dy / dx)) / zoom;
+                    if (chord * zoom > CHORD_FIELD[0] && chord * zoom < CHORD_FIELD[1]) {
+                        break;
+                    } else {
+                        dx = Math.cos(Math.atan(dy / dx)) / zoom;
+                    }
+
+                    if (dx < MIN_DELTA) {
+                        dx = MIN_DELTA;
+                        break;
+                    }
+
+                    deltaRecount++;
+                } while (deltaRecount < MAX_DELTA_RECOUNT);
+
+                if (deltaRecount > maxDeltaRecount) {
+                    maxDeltaRecount = deltaRecount;
                 }
-
-                if (dx < MIN_DELTA) {
-                    dx = MIN_DELTA;
-                    break;
-                }
-
-                deltaRecount++;
-            } while (deltaRecount < MAX_DELTA_RECOUNT);
-
-            if (deltaRecount > maxDeltaRecount) {
-                maxDeltaRecount = deltaRecount;
+            } else {
+                dx = MAX_DELTA;
             }
 
             x += dx;
             y = func(x);
 
             if (y > range[3] && y < range[1]) {
-
                 px = offset[0] + x * zoom;
                 py = offset[1] - y * zoom;
 
                 context.fillRect(px, py, 1, 1);
                 pointCount++;
-            } else {
-                //todo: y 一旦离开值域范围，将 delta 设置为较的大值，以增加绘制速度，当 y 再次返回值域内时，向前回退一次较大值的 delta，然后按照 MIN_DELTA 进行绘制；
             }
 
             iterationCount++;
+
         } while (x < range[2] && iterationCount < MAX_ITERATION);
         var endTime = new Date();
 
-        console.log('pointCount: ', pointCount);
-        console.log('iterationCount: ', iterationCount);
-        console.log('maxDeltaRecount: ', maxDeltaRecount);
-        console.log('time: ', endTime.getTime() - startTime.getTime());
+//        console.log('pointCount: ', pointCount);
+//        console.log('iterationCount: ', iterationCount);
+//        console.log('maxDeltaRecount: ', maxDeltaRecount);
+//        console.log('time: ', endTime.getTime() - startTime.getTime());
     };
 
     _prototype_.drawExpressions = function (size) {
