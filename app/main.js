@@ -5,12 +5,11 @@
 
 $(function () {
 
-    var diagraph = new JSFuncDiagraph($('#canvas'));
+    var diagraph = new JSFuncDiagraph($('#canvas'), [800, 400]);
     var expression = new Expression('y = 1/x');
+//    var expression = new Expression('y = Math.tan(x)');
 
-    diagraph.setCanvasSize(800, 600);
     diagraph.pushExpression(expression);
-
     diagraph.drawExpression(expression);
 
 });
