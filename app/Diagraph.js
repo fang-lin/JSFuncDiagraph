@@ -4,34 +4,34 @@
  */
 
 (function () {
-    function JSFuncDiagraph($canvas, size) {
+    function Diagraph($canvas, size) {
         this.$canvas = $canvas;
         this.context = this.$canvas[0].getContext('2d');
-        this.funExpressions = [];
+        this.expressions = [];
 
-        this._zoom = 10;
+        this._zoom = 16;
         this.size(size);
         this.origin(0);
         this.range();
     }
 
-    JSFuncDiagraph.MIN_DELTA = 1e-7;
-    JSFuncDiagraph.CHORD_FIELD = [.9, 1.1];
-    JSFuncDiagraph.MAX_ITERATION = 10000000000000;
-    JSFuncDiagraph.MAX_DELTA_RECOUNT = 10;
-    JSFuncDiagraph.ZOOM_RANGE = [2, 200];
+    Diagraph.MIN_DELTA = 1e-7;
+    Diagraph.CHORD_FIELD = [.9, 1.1];
+    Diagraph.MAX_ITERATION = 10000000000000;
+    Diagraph.MAX_DELTA_RECOUNT = 10;
+    Diagraph.ZOOM_RANGE = [2, 500];
 
-    var _prototype_ = JSFuncDiagraph.prototype;
+    var _prototype_ = Diagraph.prototype;
 
     _prototype_.range = function (origin, zoom) {
         var size = this.size();
         var offset = origin || this._origin;
-        var zoom = zoom || this._zoom;
+        var _zoom = zoom || this._zoom;
         this._range = [
-                -offset[0] / zoom,
-                offset[1] / zoom,
-                (size[0] - offset[0]) / zoom,
-                (offset[1] - size[1]) / zoom
+                -offset[0] / _zoom,
+                offset[1] / _zoom,
+                (size[0] - offset[0]) / _zoom,
+                (offset[1] - size[1]) / _zoom
         ];
         return this;
     };
@@ -47,6 +47,45 @@
         } else {
             return this._origin;
         }
+    };
+
+    _prototype_.drawAxis = function () {
+        var context = this.context;
+        var origin = this._origin;
+        var size = this.size();
+
+        context.beginPath();
+        context.moveTo(0, origin[1]);
+        context.lineTo(size[0], origin[1]);
+        context.moveTo(origin[0], 0);
+        context.lineTo(origin[0], size[1]);
+        context.strokeStyle = '#000';
+        context.stroke();
+        return this;
+    };
+
+    _prototype_.drawGrid = function () {
+        var context = this.context;
+        var origin = this._origin;
+        var size = this.size();
+        var zoom = this._zoom;
+
+        context.beginPath();
+        var x = origin[0] % zoom - zoom;
+        while (x < size[0]) {
+            x += zoom;
+            context.moveTo(x, 0);
+            context.lineTo(x, size[1]);
+        }
+        var y = origin[1] % zoom - zoom;
+        while (y < size[1]) {
+            y += zoom;
+            context.moveTo(0, y);
+            context.lineTo(size[0], y);
+        }
+        context.strokeStyle = '#ccc';
+        context.stroke();
+        return this;
     };
 
     _prototype_.size = function (size) {
@@ -65,8 +104,8 @@
 
     _prototype_.zoom = function (zoom) {
         if (zoom) {
-            var ZOOM_RANGE = JSFuncDiagraph.ZOOM_RANGE;
-            if (zoom > ZOOM_RANGE[0] && zoom < ZOOM_RANGE[1]) {
+            var ZOOM_RANGE = Diagraph.ZOOM_RANGE;
+            if (zoom >= ZOOM_RANGE[0] && zoom <= ZOOM_RANGE[1]) {
                 this._zoom = zoom;
             }
             return this;
@@ -76,7 +115,9 @@
     };
 
     _prototype_.pushExpression = function (expression) {
-        this.funExpressions.push(expression);
+        if (typeof expression.func === 'function' && typeof expression.color === 'string') {
+            this.expressions.push(expression);
+        }
         return this;
     };
 
@@ -89,14 +130,14 @@
         var offset = this._origin;
         var zoom = this._zoom;
 
-        var CHORD_FIELD = JSFuncDiagraph.CHORD_FIELD;
-        var MAX_ITERATION = JSFuncDiagraph.MAX_ITERATION;
-        var MAX_DELTA_RECOUNT = JSFuncDiagraph.MAX_DELTA_RECOUNT;
-        var MIN_DELTA = JSFuncDiagraph.MIN_DELTA;
+        var CHORD_FIELD = Diagraph.CHORD_FIELD;
+        var MAX_ITERATION = Diagraph.MAX_ITERATION;
+        var MAX_DELTA_RECOUNT = Diagraph.MAX_DELTA_RECOUNT;
+        var MIN_DELTA = Diagraph.MIN_DELTA;
         var MAX_DELTA = (CHORD_FIELD[0] + CHORD_FIELD[1]) / 2 / zoom;
 
         context.fillStyle = color;
-        var x = range[0], y;
+        var x = range[0], y = null;
         var dx = MAX_DELTA;
 
         var px, py;
@@ -155,11 +196,18 @@
 //        console.log('time: ', endTime.getTime() - startTime.getTime());
     };
 
-    _prototype_.drawExpressions = function (size) {
+    _prototype_.drawParametricExpression = function (expression) {
+        //todo: drawParametricExpression
+    };
+
+    _prototype_.drawExpressions = function () {
         var self = this;
-        this.erasure();
-        this.funExpressions.forEach(function (expression) {
-            self.drawExpression(expression);
+        this.expressions.forEach(function (expression) {
+            if (expression.domin) {
+                self.drawParametricExpression(expression);
+            } else {
+                self.drawExpression(expression);
+            }
         });
     };
 
@@ -167,6 +215,7 @@
         var size = this.size();
         this.context.fillStyle = '#fff';
         this.context.fillRect(0, 0, size[0], size[1]);
+        return this;
     };
 
     _prototype_.redraw = function (size, origin) {
@@ -178,8 +227,11 @@
         }
         return this
             .range()
+            .erasure()
+            .drawGrid()
+            .drawAxis()
             .drawExpressions();
     };
 
-    window.JSFuncDiagraph = JSFuncDiagraph;
+    window.Diagraph = Diagraph;
 })();

@@ -12,6 +12,11 @@
             overflow: hidden;
         }
 
+        body.drag-start,
+        body.dragging {
+            cursor: move;
+        }
+
         #canvas {
             background: #ffffff;
         }
@@ -46,7 +51,7 @@
     <script src="lib/underscore/underscore.js"></script>
     <script src="app/Palette.js"></script>
     <script src="app/Expression.js"></script>
-    <script src="app/JSFuncDiagraph.js"></script>
+    <script src="app/Diagraph.js"></script>
     <script src="app/main.js"></script>
     <title></title>
 </head>

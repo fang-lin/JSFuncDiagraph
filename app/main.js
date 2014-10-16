@@ -8,16 +8,19 @@ $(function () {
 //    var palette = new Palette($('#palette'));
 
     var $window = $(window);
-    var $body = $('html');
+    var $body = $('body');
+    var $canvas = $('#canvas');
 
-    var diagraph = new JSFuncDiagraph($('#canvas'), [$body.width(), $body.height()]);
+    var diagraph = new Diagraph($canvas, [$body.width(), $body.height()]);
     diagraph
 //        .pushExpression(new Expression('y = Math.tan(x)'));
-        .pushExpression(new Expression('y = Math.sin(x)'))
-        .pushExpression(new Expression('y = Math.cos(x)'))
-        .pushExpression(new Expression('y = -Math.sin(x)'))
-//        .pushExpression(new Expression('y = 1/x'))
-//        .pushExpression(new Expression('y = 2/x'))
+        .pushExpression(new Expression('y = sin(x)', '#600'))
+        .pushExpression(new Expression('y = arct(x)', '#660'))
+        .pushExpression(new Expression('y = - arcs(x)', '#606'))
+        .pushExpression(new Expression('y = 1/x', '#060'))
+        .pushExpression(new Expression('y = 2/x', '#006'))
+        .pushExpression(new Expression('y = pow(x, 2)', '#006'))
+//        .pushExpression(new Expression('x = 4*cos(2*q)*cos(q);y = 4*cos(2*q)*sin(q);q = (0, 2*PI);', '#066'));
 //        .pushExpression(new Expression('y = 3/x'))
 //        .pushExpression(new Expression('y = 4/x'))
 //        .pushExpression(new Expression('y = 5/x'))
@@ -59,29 +62,24 @@ $(function () {
 //        .pushExpression(new Expression('y = 100/Math.pow(x,2) - 1/Math.pow(x,4)'));
 //        .pushExpression(new Expression('y = Math.log(x)*1000'));
 //        .pushExpression(new Expression('y = 10/Math.pow(x,2) - 1/Math.pow(x,4)'));
-        .pushExpression(new Expression('y = Math.tan(x)'))
-        .pushExpression(new Expression('y = -Math.tan(x)'))
+//        .pushExpression(new Expression('y = Math.tan(x)'))
+//        .pushExpression(new Expression('y = -Math.tan(x)'))
 //        .pushExpression(new Expression('y = 1/(1-Math.pow(Math.E, x/(1-x)))'));
 
     diagraph.redraw([$body.width(), $body.height()]);
 
-    $(window).on('resize', _.throttle(function () {
+    $window.on('resize', _.throttle(function () {
         diagraph.redraw([$body.width(), $body.height()]);
-    }, 200));
+    }, 500));
 
     var redraw = _.throttle(function () {
         diagraph.redraw();
-    }, 200);
+    }, 500);
 
-    $(window).on('mousewheel', function (event) {
-        var ratio = 1.5;
-        if (event.deltaY > 0) {
-            // zoom in
-            diagraph.zoom(diagraph.zoom() * ratio);
-        } else {
-            // zoom out
-            diagraph.zoom(diagraph.zoom() / ratio);
-        }
+    $window.on('mousewheel', function (event) {
+        var ratio = 1.4142135623730951;
+
+        diagraph.zoom(event.deltaY > 0 ? diagraph.zoom() * ratio : diagraph.zoom() / ratio);
         redraw();
     });
 
@@ -91,33 +89,35 @@ $(function () {
     };
 
     var dragStart = function (event) {
+        $body.addClass('drag-start');
         drag.client = [event.clientX, event.clientY];
         drag.origin = diagraph.origin();
     };
-    var dragging = _.throttle(function (event) {
-        //todo: redraw coordinate.
-    }, 200);
+
+    var dragging = function (event) {
+        $body.removeClass('drag-start').addClass('dragging');
+        $canvas
+            .css('margin-left', event.clientX - drag.client[0])
+            .css('margin-top', event.clientY - drag.client[1]);
+    };
 
     var dragEnd = function (event) {
+        $body.removeClass('drag-start').removeClass('dragging');
         var offset = [
                 drag.origin[0] + event.clientX - drag.client[0],
                 drag.origin[1] + event.clientY - drag.client[1]
         ];
+        $canvas.css('margin-left', 0).css('margin-top', 0);
         diagraph.redraw(false, offset);
     };
 
-    $(window).on('mousedown', function (event) {
+    $window.on('mousedown', function (event) {
         dragStart(event);
-        $(window).on('mousemove.drag', dragging);
+        $window.on('mousemove.drag', dragging);
     });
 
-    $(window).on('mouseup', function (event) {
-        $(window).off('mousemove.drag');
+    $window.on('mouseup', function (event) {
+        $window.off('mousemove.drag');
         dragEnd(event);
     });
-
-
 });
-
-var y;
-console.dir(Number.isFinite(y));
