@@ -46,11 +46,13 @@
             }
         });
         if (literals.length === 1) {
+            this.literal = literals[0];
             this.func = this.functional(literals[0]);
         }
         if (literals.length === 3) {
             //parametric equation
             //todo: parametric equation
+            this.literals = literals;
             this.domin = [0, 1];
         }
     };

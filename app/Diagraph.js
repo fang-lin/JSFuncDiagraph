@@ -4,10 +4,17 @@
  */
 
 (function () {
-    function Diagraph($canvas, size) {
-        this.$canvas = $canvas;
-        this.context = this.$canvas[0].getContext('2d');
+    function Diagraph($wrap, size) {
+        this.$wrap = $wrap;
         this.expressions = [];
+
+        var $grid = this.createLayer('grid');
+        this.$wrap.append($grid);
+        this.grid = $grid[0].getContext('2d');
+
+        var $axis = this.createLayer('axis');
+        this.$wrap.append($axis);
+        this.axis = $axis[0].getContext('2d');
 
         this._zoom = 16;
         this.size(size);
@@ -20,8 +27,14 @@
     Diagraph.MAX_ITERATION = 10000000000000;
     Diagraph.MAX_DELTA_RECOUNT = 10;
     Diagraph.ZOOM_RANGE = [2, 500];
+    Diagraph.AXIS_COLOR = '#666';
+    Diagraph.GRID_COLOR = '#eee';
 
     var _prototype_ = Diagraph.prototype;
+
+    _prototype_.createLayer = function (className) {
+        return $('<canvas class="' + className + '"/>');
+    };
 
     _prototype_.range = function (origin, zoom) {
         var size = this.size();
@@ -50,7 +63,7 @@
     };
 
     _prototype_.drawAxis = function () {
-        var context = this.context;
+        var context = this.axis;
         var origin = this._origin;
         var size = this.size();
 
@@ -59,13 +72,13 @@
         context.lineTo(size[0], origin[1]);
         context.moveTo(origin[0], 0);
         context.lineTo(origin[0], size[1]);
-        context.strokeStyle = '#000';
+        context.strokeStyle = Diagraph.AXIS_COLOR;
         context.stroke();
         return this;
     };
 
     _prototype_.drawGrid = function () {
-        var context = this.context;
+        var context = this.grid;
         var origin = this._origin;
         var size = this.size();
         var zoom = this._zoom;
@@ -83,21 +96,20 @@
             context.moveTo(0, y);
             context.lineTo(size[0], y);
         }
-        context.strokeStyle = '#ccc';
+        context.strokeStyle = Diagraph.GRID_COLOR;
         context.stroke();
         return this;
     };
 
     _prototype_.size = function (size) {
         if (size) {
-            this.$canvas
-                .attr('width', size[0])
-                .attr('height', size[1]);
+            this.$wrap.attr('width', size[0]).attr('height', size[1])
+                .find('canvas').attr('width', size[0]).attr('height', size[1]);
             return this;
         } else {
             return [
-                this.$canvas.width(),
-                this.$canvas.height()
+                this.$wrap.width(),
+                this.$wrap.height()
             ];
         }
     };
@@ -116,6 +128,9 @@
 
     _prototype_.pushExpression = function (expression) {
         if (typeof expression.func === 'function' && typeof expression.color === 'string') {
+            var $canvas = this.createLayer('expression');
+            this.$wrap.append($canvas);
+            expression.canvas = $canvas[0].getContext('2d');
             this.expressions.push(expression);
         }
         return this;
@@ -123,9 +138,20 @@
 
     _prototype_.drawExpression = function (expression) {
 
+
+        var worker = new Worker('app/drawExpression.js');
+        worker.postMessage({
+            color: expression.color,
+            literal: expression.literal
+        });
+
+        worker.addEventListener('message', function () {
+
+        });
+
         var func = expression.func;
         var color = expression.color;
-        var context = this.context;
+        var context = expression.canvas;
         var range = this._range;
         var offset = this._origin;
         var zoom = this._zoom;
@@ -145,9 +171,9 @@
         var maxDeltaRecount = 0;
         var pointCount = 0;
         var iterationCount = 0;
-        var startTime = new Date();
+//        var startTime = new Date();
         do {
-            if (Number.isFinite(y)) {
+            if (Math.abs(y) < Number.MAX_VALUE) {
                 var deltaRecount = 0;
                 do {
                     var dy = y - func(x + dx);
@@ -213,18 +239,15 @@
 
     _prototype_.erasure = function () {
         var size = this.size();
-        this.context.fillStyle = '#fff';
-        this.context.fillRect(0, 0, size[0], size[1]);
+        this.$wrap.find('canvas')
+            .attr('width', 0).attr('height', 0)
+            .attr('width', size[0]).attr('height', size[1]);
         return this;
     };
 
     _prototype_.redraw = function (size, origin) {
-        if (size) {
-            this.size(size);
-        }
-        if (origin) {
-            this.origin(origin);
-        }
+        this.size(size);
+        this.origin(origin);
         return this
             .range()
             .erasure()
