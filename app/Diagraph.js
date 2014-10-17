@@ -138,88 +138,31 @@
 
     _prototype_.drawExpression = function (expression) {
 
+        var color = expression.color;
+        var context = expression.canvas;
 
         var worker = new Worker('app/drawExpression.js');
         worker.postMessage({
-            color: expression.color,
-            literal: expression.literal
+            literal: expression.literal,
+            range: this._range,
+            zoom: this._zoom,
+            offset: this._origin,
+            CHORD_FIELD: Diagraph.CHORD_FIELD,
+            MAX_ITERATION: Diagraph.MAX_ITERATION,
+            MAX_DELTA_RECOUNT: Diagraph.MAX_DELTA_RECOUNT,
+            MIN_DELTA: Diagraph.MIN_DELTA
         });
-
-        worker.addEventListener('message', function () {
-
-        });
-
-        var func = expression.func;
-        var color = expression.color;
-        var context = expression.canvas;
-        var range = this._range;
-        var offset = this._origin;
-        var zoom = this._zoom;
-
-        var CHORD_FIELD = Diagraph.CHORD_FIELD;
-        var MAX_ITERATION = Diagraph.MAX_ITERATION;
-        var MAX_DELTA_RECOUNT = Diagraph.MAX_DELTA_RECOUNT;
-        var MIN_DELTA = Diagraph.MIN_DELTA;
-        var MAX_DELTA = (CHORD_FIELD[0] + CHORD_FIELD[1]) / 2 / zoom;
 
         context.fillStyle = color;
-        var x = range[0], y = null;
-        var dx = MAX_DELTA;
 
-        var px, py;
-
-        var maxDeltaRecount = 0;
-        var pointCount = 0;
-        var iterationCount = 0;
-//        var startTime = new Date();
-        do {
-            if (Math.abs(y) < Number.MAX_VALUE) {
-                var deltaRecount = 0;
-                do {
-                    var dy = y - func(x + dx);
-                    var chord = Math.pow(Math.pow(dx, 2) + Math.pow(dy, 2), .5);
-
-                    if (chord * zoom > CHORD_FIELD[0] && chord * zoom < CHORD_FIELD[1]) {
-                        break;
-                    } else {
-                        dx = Math.cos(Math.atan(dy / dx)) / zoom;
-                    }
-
-                    if (dx < MIN_DELTA) {
-                        dx = MIN_DELTA;
-                        break;
-                    }
-
-                    deltaRecount++;
-                } while (deltaRecount < MAX_DELTA_RECOUNT);
-
-                if (deltaRecount > maxDeltaRecount) {
-                    maxDeltaRecount = deltaRecount;
-                }
+        worker.addEventListener('message', function (msg) {
+            var data = msg.data;
+            if (data) {
+                context.fillRect(data.x, data.y, 1, 1);
             } else {
-                dx = MAX_DELTA;
+
             }
-
-            x += dx;
-            y = func(x);
-
-            if (y > range[3] && y < range[1]) {
-                px = offset[0] + x * zoom;
-                py = offset[1] - y * zoom;
-
-                context.fillRect(px, py, 1, 1);
-                pointCount++;
-            }
-
-            iterationCount++;
-
-        } while (x < range[2] && iterationCount < MAX_ITERATION);
-        var endTime = new Date();
-
-//        console.log('pointCount: ', pointCount);
-//        console.log('iterationCount: ', iterationCount);
-//        console.log('maxDeltaRecount: ', maxDeltaRecount);
-//        console.log('time: ', endTime.getTime() - startTime.getTime());
+        });
     };
 
     _prototype_.drawParametricExpression = function (expression) {
