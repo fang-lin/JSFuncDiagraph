@@ -1,0 +1,113 @@
+@import '../lib/normalize-css/normalize.css';
+html,
+body {
+  width: 100%;
+  height: 100%;
+  margin: 0;
+  padding: 0;
+  background: #ccc;
+  overflow: hidden;
+}
+body.drag-start,
+body.dragging {
+  cursor: move;
+  -webkit-user-select: none;
+  -moz-user-select: none;
+  -ms-user-select: none;
+  user-select: none;
+}
+#tl-panel,
+#tr-panel,
+#bl-panel,
+#br-panel {
+  position: absolute;
+  z-index: 10;
+  font-size: 12px;
+}
+#tl-panel {
+  top: 20px;
+  left: 20px;
+}
+#tr-panel {
+  top: 20px;
+  right: 20px;
+}
+#bl-panel {
+  bottom: 20px;
+  left: 20px;
+}
+#br-panel {
+  bottom: 20px;
+  right: 20px;
+}
+.cursor-coordinate {
+  font-family: consolas courier, monospace;
+}
+#tl-panel h1 {
+  font-size: 12px;
+  margin: 0;
+  padding: 0 0 10px 0;
+}
+#canvas {
+  background: #ffffff;
+  width: 100%;
+  height: 100%;
+  -webkit-box-shadow: 0 0 10px #666666;
+  -moz-box-shadow: 0 0 10px #666666;
+  box-shadow: 0 0 10px #666666;
+}
+#canvas canvas {
+  position: absolute;
+  background: transparent;
+}
+#mask {
+  position: absolute;
+  z-index: 5;
+  width: 100%;
+  height: 100%;
+}
+#line-x,
+#line-y {
+  position: absolute;
+  margin: 0;
+  padding: 0;
+  font-size: 0;
+  line-height: 0;
+  background: #666;
+  border: medium none;
+  -webkit-user-select: none;
+  -moz-user-select: none;
+  -ms-user-select: none;
+  user-select: none;
+}
+#line-x {
+  left: -99999px;
+  width: 1px;
+  height: 100%;
+}
+#line-y {
+  top: -99999px;
+  width: 100%;
+  height: 1px;
+}
+#palette {
+  width: 384px;
+}
+#palette a {
+  float: left;
+  width: 4px;
+  height: 4px;
+  border-width: 1px;
+  border-style: solid;
+}
+#palette a:hover {
+  border-color: #ffffff !important;
+}
+#palette:after {
+  content: ' ';
+  display: block;
+  height: 0;
+  font-size: 0;
+  line-height: 0;
+  clear: both;
+}
