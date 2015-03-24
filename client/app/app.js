@@ -7,10 +7,11 @@ define([
     'Diagraph',
     'Palette',
     'Expression',
+    'expressionsParser',
     'backbone',
     'jquery.mousewheel',
     'lz-string'
-], function (Diagraph, Palette, Expression) {
+], function (Diagraph, Palette, Expression, expressionsParser) {
     'use strict';
 
     LZString._keyStr = 'ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789+-=';
@@ -57,30 +58,6 @@ define([
                 var exprs = item.split('#');
                 diagraph.pushExpression(new Expression(exprs[0], exprs[1]));
             });
-
-
-            //diagraph
-            //    .pushExpression(new Expression(EXPRESSIONS));
-            //.pushExpression(new Expression('y = 1/x', '#ff0'))
-            //.pushExpression(new Expression('y = 2/x', '#0f0'))
-            //.pushExpression(new Expression('y = 3/x'))
-            //.pushExpression(new Expression('y = 4/x'))
-            //.pushExpression(new Expression('y = 5/x'))
-            //.pushExpression(new Expression('y = 6/x'))
-            //.pushExpression(new Expression('y = 7/x'))
-            //.pushExpression(new Expression('y = 8/x'))
-            //.pushExpression(new Expression('y = 9/x'))
-            //.pushExpression(new Expression('y = 10/x'))
-            //.pushExpression(new Expression('y = 11/x'))
-            //.pushExpression(new Expression('y = 12/x'))
-            //.pushExpression(new Expression('y = 13/x'))
-            //.pushExpression(new Expression('y = 14/x'))
-            //.pushExpression(new Expression('y = 15/x'))
-            //.pushExpression(new Expression('y = 16/x'))
-            //.pushExpression(new Expression('y = 17/x'))
-            //.pushExpression(new Expression('y = 18/x'))
-            //.pushExpression(new Expression('y = 19/x'))
-            //.pushExpression(new Expression('y = 19/x'));
 
             diagraph.redraw(SIZE);
 
