@@ -8,7 +8,7 @@ define([], function () {
 
     function Expression(literal, color) {
         this.split(this.calibrate(this.trim(literal)));
-        this.color = color || '#333';
+        this.color = '#' + (color || '#333').replace(/#/g, '');
     }
 
     Expression.MATH_FUNC = {

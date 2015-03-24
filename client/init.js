@@ -11,7 +11,7 @@ requirejs.config({
         'underscore': 'lib/underscore/underscore',
         'lz-string': 'lib/lz-string/libs/lz-string',
         'catiline': 'lib/catiline/dist/catiline',
-        'page': 'lib/page/page',
+        'backbone': 'lib/backbone/backbone',
         // Apps
         'app': 'app/app',
         'Diagraph': 'app/Diagraph',
@@ -21,6 +21,9 @@ requirejs.config({
     shim: {
         'jquery.mousewheel': {
             deps: ['jquery']
+        },
+        'backbone': {
+            deps: ['underscore']
         }
     }
 });

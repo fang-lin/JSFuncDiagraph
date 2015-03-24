@@ -11,7 +11,7 @@ requirejs.config({
         'underscore': 'lib/underscore/underscore-min',
         'lz-string': 'lib/lz-string/libs/lz-string.min',
         'catiline': 'lib/catiline/dist/catiline.min',
-        'page': 'lib/page/page',
+        'backbone': 'lib/backbone/backbone',
         // Apps
         'app': 'app/app',
         'Diagraph': 'app/Diagraph',

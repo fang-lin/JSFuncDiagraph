@@ -33,5 +33,5 @@ define([], function () {
         });
     };
 
-    window.Palette = Palette;
+    return Palette;
 });
