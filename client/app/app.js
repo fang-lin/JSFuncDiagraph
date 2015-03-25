@@ -44,8 +44,8 @@ define([
             var _zoom = parseZoom(zoomLevel);
 
             ZOOM_LEVEL = zoomLevel;
-            Diagraph.SMOOTH = enableSmooth === 'true';
-            ENABLE_CROSS_CURSOR = enableCrossCursor === 'true';
+            Diagraph.SMOOTH = enableSmooth === 'on';
+            ENABLE_CROSS_CURSOR = enableCrossCursor === 'on';
             EXPRESSIONS = LZString.decompressFromBase64(exprBase64);
             console.log(EXPRESSIONS);
 
@@ -145,7 +145,7 @@ define([
         $smoothBtn.html();
         diagraph.redraw();
         refreshState({
-            enableSmooth: Diagraph.SMOOTH
+            enableSmooth: Diagraph.SMOOTH ? 'on' : 'off'
         });
     });
 
@@ -158,7 +158,7 @@ define([
             $lineY.css('top', '-99999px');
         }
         refreshState({
-            enableCrossCursor: ENABLE_CROSS_CURSOR
+            enableCrossCursor: ENABLE_CROSS_CURSOR ? 'on' : 'off'
         });
     });
 
@@ -218,8 +218,8 @@ define([
         var _state = $.extend({
             origin: toOrigin(diagraph.origin()),
             zoom: Math.round(ZOOM_LEVEL),
-            enableSmooth: Diagraph.SMOOTH,
-            enableCrossCursor: ENABLE_CROSS_CURSOR,
+            enableSmooth: Diagraph.SMOOTH ? 'on' : 'off',
+            enableCrossCursor: ENABLE_CROSS_CURSOR ? 'on' : 'off',
             expr: LZString.compressToBase64(EXPRESSIONS)
         }, state);
 
