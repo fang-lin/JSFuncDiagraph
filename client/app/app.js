@@ -7,38 +7,61 @@ define([
     'Diagraph',
     'Palette',
     'Expression',
-    'expressionsParser',
+    'parser',
     'backbone',
-    'jquery.mousewheel',
-    'lz-string'
-], function (Diagraph, Palette, Expression, expressionsParser) {
+    'jquery.mousewheel'
+], function (Diagraph, Palette, Expression, parser) {
     'use strict';
-
-    LZString._keyStr = 'ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789+-=';
 
     var RATIO = 1.4142135623730951;
     var WHEEL_DAMP = 300;
     var ZOOM_LEVEL = 7;
     var ENABLE_CROSS_CURSOR = true;
     var DELTA_SUM = 0;
-    var EXPRESSIONS = LZString.compressToBase64('y=x#f00|y=pow(x,2)#ff0|y=1/x');
-    console.log(EXPRESSIONS);
+    var EXPRESSIONS = [
+        ['y=x', 'f00'],
+        ['y=pow(x,2)', 'ff0'],
+        ['y=1/x']
+    ];
     var SIZE;
 
     var $window = $(window);
     var $body = $('body');
     var $canvas = $('#canvas');
+
+    var $zoomLevel = $('#zoom-level').html(ZOOM_LEVEL),
+        $smoothBtn = $('#smooth-btn'),
+        $crossCursorBtn = $('#cross-cursor-btn'),
+        $drawingState = $('#drawing-state'),
+        $cursorX = $('#cursor-x'),
+        $cursorY = $('#cursor-y');
+
+    var $lineX = $('#line-x'),
+        $lineY = $('#line-y');
+
+    var drag = {
+        client: [],
+        origin: []
+    };
+
     refreshSize();
 
     var diagraph = new Diagraph($canvas, SIZE);
     //var palette = new Palette($('#palette'));
 
+    diagraph.on('drawingStart', function () {
+        $drawingState.html('drawing...');
+    });
+    diagraph.on('drawingComplete', function () {
+        $drawingState.html('complete.');
+    });
+
     var Router = Backbone.Router.extend({
         routes: {
-            ':x/:y/:zoom/:isSmooth/:hasCrossCursor/:expressions': 'main',
+            ':x/:y/:zoom/:enableSmooth/:enableCrossCursor/:exprCode': 'main',
             '*otherwise': 'otherwise'
         },
-        main: function (x, y, zoom, enableSmooth, enableCrossCursor, exprBase64) {
+        main: function (x, y, zoom, enableSmooth, enableCrossCursor, exprCode) {
             var origin = [Math.round(x), Math.round(y)];
             var zoomLevel = Math.round(zoom);
             var _zoom = parseZoom(zoomLevel);
@@ -46,17 +69,15 @@ define([
             ZOOM_LEVEL = zoomLevel;
             Diagraph.SMOOTH = enableSmooth === 'on';
             ENABLE_CROSS_CURSOR = enableCrossCursor === 'on';
-            EXPRESSIONS = LZString.decompressFromBase64(exprBase64);
-            console.log(EXPRESSIONS);
+            EXPRESSIONS = parser.decompress(exprCode);
 
             diagraph.zoom(_zoom);
             diagraph.origin(parseOrigin(origin));
 
             refreshState({});
 
-            EXPRESSIONS.split('|').forEach(function (item) {
-                var exprs = item.split('#');
-                diagraph.pushExpression(new Expression(exprs[0], exprs[1]));
+            EXPRESSIONS.forEach(function (expr) {
+                diagraph.pushExpression(new Expression(expr[0], expr[1]));
             });
 
             diagraph.redraw(SIZE);
@@ -70,20 +91,6 @@ define([
     var router = new Router();
 
     Backbone.history.start({pushState: true});
-
-    var drag = {
-        client: [],
-        origin: []
-    };
-
-    var $zoomLevel = $('#zoom-level').html(ZOOM_LEVEL),
-        $smoothBtn = $('#smooth-btn'),
-        $crossCursorBtn = $('#cross-cursor-btn'),
-        $cursorX = $('#cursor-x'),
-        $cursorY = $('#cursor-y');
-
-    var $lineX = $('#line-x'),
-        $lineY = $('#line-y');
 
     refreshSmoothBtn();
     refreshCrossCursorBtn();
@@ -220,7 +227,7 @@ define([
             zoom: Math.round(ZOOM_LEVEL),
             enableSmooth: Diagraph.SMOOTH ? 'on' : 'off',
             enableCrossCursor: ENABLE_CROSS_CURSOR ? 'on' : 'off',
-            expr: LZString.compressToBase64(EXPRESSIONS)
+            expr: parser.compress(EXPRESSIONS)
         }, state);
 
         router.navigate(

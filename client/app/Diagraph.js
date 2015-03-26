@@ -5,7 +5,7 @@
 
 define([
     '../lib/catiline/dist/catiline'
-], function (catiline) {
+], function (cw) {
     'use strict';
 
     function Diagraph($wrap, size) {
@@ -25,6 +25,8 @@ define([
         this.origin(0);
         this.range();
         this.drawingWorker(8);
+
+        this._events = {};
     }
 
     Diagraph.MIN_DELTA = 1e-7;
@@ -232,7 +234,7 @@ define([
     };
 
     _prototype_.drawingWorker = function (workersSize) {
-        this._drawingWorker = catiline({
+        this._drawingWorker = cw({
             coords: this.drawingToCoords
         }, workersSize);
         return this;
@@ -258,6 +260,9 @@ define([
                 result.coords.forEach(function (coord) {
                     expression.canvas.fillRect(coord[0], coord[1], 1, 1);
                 });
+                if (++self._drawingCounter === self.expressions.length) {
+                    self.trigger('drawingComplete');
+                }
             }
         });
     };
@@ -269,6 +274,8 @@ define([
     _prototype_.drawExpressions = function () {
         var self = this;
         this._drawingWorker.clearQueue();
+        this._drawingCounter = 0;
+        this.trigger('drawingStart');
         this.expressions.forEach(function (expression) {
             if (expression.domin) {
                 self.drawParametricExpression(expression);
@@ -296,6 +303,17 @@ define([
             .drawGrid()
             .drawAxis()
             .drawExpressions();
+    };
+
+    _prototype_.on = function (type, cb) {
+        this._events[type] = cb;
+    };
+
+    _prototype_.trigger = function (type) {
+        var cb = this._events[type];
+        if (cb) {
+            cb(type);
+        }
     };
 
     return Diagraph;

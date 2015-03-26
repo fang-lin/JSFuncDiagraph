@@ -17,7 +17,7 @@ requirejs.config({
         'Diagraph': 'app/Diagraph',
         'Expression': 'app/Expression',
         'Palette': 'app/Palette',
-        'expressionsParser': 'app/expressionsParser'
+        'parser': 'app/parser'
     },
     shim: {
         'jquery.mousewheel': {
