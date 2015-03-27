@@ -16,6 +16,7 @@ requirejs.config({
         'app': 'app/app',
         'Diagraph': 'app/Diagraph',
         'Expression': 'app/Expression',
-        'Palette': 'app/Palette'
+        'Palette': 'app/Palette',
+        'parser': 'app/parser'
     }
 });

@@ -81,7 +81,6 @@ define([
             });
 
             diagraph.redraw(SIZE);
-
         },
         otherwise: function () {
             refreshState({}, true);
