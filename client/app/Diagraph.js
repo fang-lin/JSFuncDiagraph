@@ -24,7 +24,7 @@ define([
         this.size(size);
         this.origin(0);
         this.range();
-        this.drawingWorker(8);
+        this.initDrawingWorker(8);
 
         this._events = {};
     }
@@ -136,6 +136,7 @@ define([
     };
 
     _prototype_.pushExpression = function (expression) {
+        console.log(expression)
         if (typeof expression.func === 'function' && typeof expression.color === 'string') {
             var $canvas = this.createLayer('expression');
             this.$wrap.append($canvas);
@@ -145,7 +146,7 @@ define([
         return this;
     };
 
-    _prototype_.drawingToCoords = function (data) {
+    _prototype_.equationToCoords = function (data) {
 
         var range = data.range,
             literal = data.literal,
@@ -233,16 +234,108 @@ define([
         };
     };
 
-    _prototype_.drawingWorker = function (workersSize) {
+    _prototype_.parametricToCoords = function (data) {
+
+        var range = data.range,
+            literal = data.literal,
+            offset = data.offset,
+            zoom = data.zoom,
+            redrawId = data.redrawId;
+
+        var CHORD_FIELD = data.CHORD_FIELD,
+            MAX_VALUE = data.MAX_VALUE,
+            MAX_ITERATION = data.MAX_ITERATION,
+            MAX_DELTA_RECOUNT = data.MAX_DELTA_RECOUNT,
+            MIN_DELTA = data.MIN_DELTA,
+            MAX_DELTA = (CHORD_FIELD[0] + CHORD_FIELD[1]) / 2 / zoom,
+            SMOOTH = data.SMOOTH;
+
+        var x = range[0],
+            y = null,
+            dx = MAX_DELTA;
+
+        var px, py,
+            coords = [];
+
+        var maxDeltaRecount = 0,
+            fillCount = 0,
+            iterationCount = 0;
+
+        var func;
+
+        try {
+            func = new Function('x', 'return ' + literal + ';');
+        } catch (err) {
+            console.error(err);
+            func = null;
+            return [];
+        }
+
+        do {
+            if (isNaN(y) || Math.abs(y) >= MAX_VALUE) {
+                dx = MAX_DELTA;
+            } else {
+                var deltaRecount = 0;
+                do {
+                    var dy = y - func(x + dx);
+                    var chord = Math.pow(Math.pow(dx, 2) + Math.pow(dy, 2), 0.5);
+
+                    if (chord * zoom > CHORD_FIELD[0] && chord * zoom < CHORD_FIELD[1]) {
+                        break;
+                    } else {
+                        dx = Math.cos(Math.atan(dy / dx)) / zoom;
+                    }
+
+                    if (dx < MIN_DELTA) {
+                        dx = MIN_DELTA;
+                        break;
+                    }
+
+                    deltaRecount++;
+                } while (deltaRecount < MAX_DELTA_RECOUNT);
+
+                if (deltaRecount > maxDeltaRecount) {
+                    maxDeltaRecount = deltaRecount;
+                }
+            }
+
+            if (isNaN(dx)) {
+                dx = MIN_DELTA;
+            }
+
+            x += dx;
+            y = func(x);
+
+            if (y > range[3] && y < range[1]) {
+                px = offset[0] + x * zoom;
+                py = offset[1] - y * zoom;
+                coords.push(SMOOTH ? [px, py] : [Math.round(px), Math.round(py)]);
+                fillCount++;
+            }
+
+            iterationCount++;
+
+        } while (x < range[2] && iterationCount < MAX_ITERATION);
+
+        return {
+            redrawId: redrawId,
+            coords: coords
+        };
+    };
+
+    _prototype_.initDrawingWorker = function (workersSize) {
         this._drawingWorker = cw({
-            coords: this.drawingToCoords
+            equation: this.equationToCoords,
+            parametric: this.parametricToCoords
         }, workersSize);
         return this;
     };
 
     _prototype_.drawExpression = function (expression) {
         var self = this;
-        this._drawingWorker.coords({
+
+        // todo: check the expression whether or not parametric
+        this._drawingWorker.equation({
             range: this._range,
             literal: expression.literal,
             offset: this._origin,

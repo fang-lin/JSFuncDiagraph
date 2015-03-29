@@ -19,7 +19,8 @@ var gulp = require('gulp'),
     copy2 = require('gulp-copy2'),
     sh = require('shelljs'),
     path = require('path'),
-    //sprite = require('css-sprite').stream,
+    gulpIf = require('gulp-if'),
+    sprite = require('css-sprite').stream,
     Q = require('q'),
     _ = require('underscore'),
     fs = require('fs'),
@@ -80,6 +81,19 @@ gulp.task('bower', ['clean'], function (done) {
 });
 
 // endregion bower
+
+
+gulp.task('sprites', function () {
+    return gulp.src('./client/images/*.png')
+        .pipe(sprite({
+            name: 'sprite',
+            style: '_sprite.less',
+            cssPath: './img',
+            processor: 'less'
+        }))
+        .pipe(gulpIf('*.png', gulp.dest('./dist/img/'), gulp.dest('./dist/scss/')))
+});
+
 // region minify-css
 
 gulp.task('minify-css', ['less'], function () {

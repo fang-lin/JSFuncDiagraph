@@ -34,19 +34,20 @@ define([], function () {
         var func;
         try {
             func = new Function('x', 'return ' + literal + ';');
-        } catch (e) {
+        } catch (err) {
+            console.error(err);
             func = null;
         }
         return func;
     };
 
     _prototype_.split = function (literal) {
-        var literals = [];
-        literal.split(';').forEach(function (_literal) {
-            if (_literal) {
-                literals.push(_literal);
-            }
-        });
+        var literals = literal.split(';')
+            .map(function (item) {
+                return item;
+            }).filter(function (item) {
+                return item;
+            });
         if (literals.length === 1) {
             this.literal = literals[0];
             this.func = this.functional(literals[0]);
@@ -65,13 +66,12 @@ define([], function () {
 
     _prototype_.calibrate = function (literal) {
         var MATH_FUNC = Expression.MATH_FUNC;
-        var _literal = literal;
         for (var func in MATH_FUNC) {
             if (MATH_FUNC.hasOwnProperty(func)) {
-                _literal = _literal.replace(MATH_FUNC[func], func);
+                literal = literal.replace(eval('/' + MATH_FUNC[func] + '/g'), func);
             }
         }
-        return _literal;
+        return literal;
     };
 
     return Expression;

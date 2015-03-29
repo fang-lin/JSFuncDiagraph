@@ -7,6 +7,7 @@ body {
   padding: 0;
   background: #ccc;
   overflow: hidden;
+  cursor: crosshair;
 }
 body.drag-start,
 body.dragging {
@@ -22,7 +23,19 @@ body.dragging {
 #br-panel {
   position: absolute;
   z-index: 10;
-  font-size: 12px;
+}
+#tl-panel button,
+#tr-panel button,
+#bl-panel button,
+#br-panel button {
+  background: url("../images/buttons.png");
+  font-size: 0;
+  line-height: 0;
+  border: medium none;
+  outline: medium none;
+  width: 28px;
+  height: 28px;
+  padding: 0;
 }
 #tl-panel {
   top: 20px;
@@ -62,7 +75,6 @@ body.dragging {
 }
 #mask {
   position: absolute;
-  z-index: 5;
   width: 100%;
   height: 100%;
 }
@@ -75,6 +87,7 @@ body.dragging {
   line-height: 0;
   background: #666;
   border: medium none;
+  z-index: 9;
   -webkit-user-select: none;
   -moz-user-select: none;
   -ms-user-select: none;
