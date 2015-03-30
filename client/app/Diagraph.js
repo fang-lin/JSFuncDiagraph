@@ -136,7 +136,7 @@ define([
     };
 
     _prototype_.pushExpression = function (expression) {
-        console.log(expression)
+        console.log(expression);
         if (typeof expression.func === 'function' && typeof expression.color === 'string') {
             var $canvas = this.createLayer('expression');
             this.$wrap.append($canvas);
