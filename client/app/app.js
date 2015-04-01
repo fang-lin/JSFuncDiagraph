@@ -13,6 +13,8 @@ define([
 ], function (Diagraph, Palette, Expression, parser) {
     'use strict';
 
+    var ON = 'on';
+    var OFF = 'off';
     var RATIO = 1.4142135623730951;
     var WHEEL_DAMP = 300;
     var ZOOM_LEVEL = 7;
@@ -29,9 +31,9 @@ define([
     var $body = $('body');
     var $canvas = $('#canvas');
 
-    var $zoomLevel = $('#zoom-level').html(ZOOM_LEVEL),
+    var $zoomLevel = $('#zoom-level'),
         $smoothBtn = $('#smooth-btn'),
-        $crossCursorBtn = $('#cross-cursor-btn'),
+        $cursorBtn = $('#cursor-btn'),
         $drawingState = $('#drawing-state'),
         $cursorX = $('#cursor-x'),
         $cursorY = $('#cursor-y');
@@ -67,8 +69,8 @@ define([
             var _zoom = parseZoom(zoomLevel);
 
             ZOOM_LEVEL = zoomLevel;
-            Diagraph.SMOOTH = enableSmooth === 'on';
-            ENABLE_CROSS_CURSOR = enableCrossCursor === 'on';
+            Diagraph.SMOOTH = enableSmooth === ON;
+            ENABLE_CROSS_CURSOR = enableCrossCursor === ON;
             EXPRESSIONS = parser.decompress(exprCode);
 
             diagraph.zoom(_zoom);
@@ -93,6 +95,7 @@ define([
 
     refreshSmoothBtn();
     refreshCrossCursorBtn();
+    refreshZoomLevel();
 
     $('#bl-panel button, #br-panel button').on('mousedown', function (event) {
         event.stopPropagation();
@@ -151,11 +154,11 @@ define([
         $smoothBtn.html();
         diagraph.redraw();
         refreshState({
-            enableSmooth: Diagraph.SMOOTH ? 'on' : 'off'
+            enableSmooth: Diagraph.SMOOTH ? ON : OFF
         });
     });
 
-    $crossCursorBtn.on('click', function (event) {
+    $cursorBtn.on('click', function (event) {
         event.stopPropagation();
         ENABLE_CROSS_CURSOR = !ENABLE_CROSS_CURSOR;
         refreshCrossCursorBtn();
@@ -164,16 +167,30 @@ define([
             $lineY.css('top', '-99999px');
         }
         refreshState({
-            enableCrossCursor: ENABLE_CROSS_CURSOR ? 'on' : 'off'
+            enableCrossCursor: ENABLE_CROSS_CURSOR ? ON : OFF
         });
     });
 
     function refreshSmoothBtn() {
-        $smoothBtn.children('span').html(Diagraph.SMOOTH ? 'On' : 'Off');
+        var title = 'Smooth: ' + (Diagraph.SMOOTH ? ON : OFF);
+        $smoothBtn.html(title).attr('title', title);
+        Diagraph.SMOOTH ?
+            $smoothBtn.addClass(ON) :
+            $smoothBtn.removeClass(ON);
     }
 
     function refreshCrossCursorBtn() {
-        $crossCursorBtn.children('span').html(ENABLE_CROSS_CURSOR ? 'On' : 'Off');
+        var title = 'Cursor: ' + (ENABLE_CROSS_CURSOR ? ON : OFF);
+        $cursorBtn.html(title).attr('title', title);
+        ENABLE_CROSS_CURSOR ?
+            $cursorBtn.addClass(ON) :
+            $cursorBtn.removeClass(ON);
+    }
+
+    function refreshZoomLevel() {
+        var title = 'x' + ZOOM_LEVEL;
+        $zoomLevel.html(title).attr('title', title);
+        $zoomLevel.removeClass().addClass('x' + ZOOM_LEVEL);
     }
 
     function onDragStart(event) {
@@ -224,8 +241,8 @@ define([
         var _state = $.extend({
             origin: toOrigin(diagraph.origin()),
             zoom: Math.round(ZOOM_LEVEL),
-            enableSmooth: Diagraph.SMOOTH ? 'on' : 'off',
-            enableCrossCursor: ENABLE_CROSS_CURSOR ? 'on' : 'off',
+            enableSmooth: Diagraph.SMOOTH ? ON : OFF,
+            enableCrossCursor: ENABLE_CROSS_CURSOR ? ON : OFF,
             expr: parser.compress(EXPRESSIONS)
         }, state);
 
@@ -252,7 +269,7 @@ define([
 
             if (diagraph.zoom() === zoom) {
                 diagraph.redraw();
-                $zoomLevel.html(ZOOM_LEVEL);
+                refreshZoomLevel();
                 refreshState({zoom: ZOOM_LEVEL});
             } else {
                 ZOOM_LEVEL -= _delta;

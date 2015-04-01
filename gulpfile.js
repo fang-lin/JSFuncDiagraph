@@ -19,8 +19,8 @@ var gulp = require('gulp'),
     copy2 = require('gulp-copy2'),
     sh = require('shelljs'),
     path = require('path'),
-//gulpIf = require('gulp-if'),
-//sprite = require('css-sprite').stream,
+    gulpIf = require('gulp-if'),
+    sprite = require('css-sprite').stream,
     Q = require('q'),
     _ = require('underscore'),
     fs = require('fs'),
@@ -42,7 +42,7 @@ gulp.task('lint', function () {
 // endregion lint
 // region less
 
-gulp.task('less', ['bower'], function () {
+gulp.task('less', function () {
     return gulp.src('client/css/main.less')
         .pipe(less())
         .on('error', function (err) {
@@ -69,7 +69,7 @@ gulp.task('nodemon', function () {
 // region watch
 
 gulp.task('watch', function () {
-    gulp.watch('./client/css/*.less', ['less']);
+    gulp.watch('./client/css/main.less', ['less']);
     gulp.watch('./githook.hb', ['git-hook']);
 });
 
@@ -83,14 +83,14 @@ gulp.task('bower', ['clean'], function (done) {
 // endregion bower
 
 gulp.task('sprites', function () {
-    return gulp.src('./client/img/*.png')
+    return gulp.src('./client/img/slice/*.png')
         .pipe(sprite({
-            name: 'sprite',
-            style: '_sprite.less',
-            cssPath: './img',
+            name: 'buttons',
+            style: 'buttons.less',
+            cssPath: '../img/',
             processor: 'less'
         }))
-        .pipe(gulpIf('*.png', gulp.dest('./dist/img/'), gulp.dest('./dist/scss/')))
+        .pipe(gulpIf('*.png', gulp.dest('./client/img/'), gulp.dest('./client/css/')))
 });
 
 // region minify-css

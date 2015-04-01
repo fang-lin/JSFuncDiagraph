@@ -1,4 +1,5 @@
 @import '../lib/normalize-css/normalize.css';
+@import 'buttons.less';
 @import 'mixins.less';
 
 html, body {
@@ -18,13 +19,13 @@ body.dragging {
 }
 
 #tl-panel,
-#tr-panel,
 #bl-panel,
 #br-panel {
   position: absolute;
   z-index: 10;
   button {
-    background: url("../img/buttons.png");
+    .icon();
+    background-color: transparent;
     font-size: 0;
     line-height: 0;
     border: medium none;
@@ -33,26 +34,144 @@ body.dragging {
     height: 28px;
     padding: 0;
   }
+  &:after {
+    content: ' ';
+    display: block;
+    height: 0;
+    line-height: 0;
+    font-size: 0;
+    clear: both;
+  }
+}
+
+#tl-panel,
+#bl-panel {
+  left: 20px;
+  button {
+    float: left;
+  }
+}
+
+#br-panel {
+  right: 20px;
+  button {
+    float: right;
+  }
 }
 
 #tl-panel {
   top: 20px;
-  left: 20px;
 }
 
-#tr-panel {
-  top: 20px;
-  right: 20px;
+#bl-panel,
+#br-panel {
+  bottom: 20px;
 }
 
 #bl-panel {
-  bottom: 20px;
-  left: 20px;
+  button {
+    margin-right: 5px;
+  }
 }
 
-#br-panel {
-  bottom: 20px;
-  right: 20px;
+#centered-btn {
+  .sprite-position(@centered);
+  &:hover {
+    .sprite-position(@centered-hover);
+  }
+}
+
+#smooth-btn {
+  .sprite-position(@smooth-off);
+  &:hover {
+    .sprite-position(@smooth-off-hover);
+  }
+  &.on {
+    .sprite-position(@smooth-on);
+    &:hover {
+      .sprite-position(@smooth-on-hover);
+    }
+  }
+}
+
+#cursor-btn {
+  .sprite-position(@cursor-off);
+  &:hover {
+    .sprite-position(@cursor-off-hover);
+  }
+  &.on {
+    .sprite-position(@cursor-on);
+    &:hover {
+      .sprite-position(@cursor-on-hover);
+    }
+  }
+}
+
+#zoom-out-btn {
+  .sprite-position(@zoom-out);
+  &:hover {
+    .sprite-position(@zoom-out-hover);
+  }
+}
+
+#zoom-in-btn {
+  .sprite-position(@zoom-in);
+  &:hover {
+    .sprite-position(@zoom-in-hover);
+  }
+}
+
+#zoom-level {
+  margin-right: 5px;
+  .sprite-position(@x1);
+  &.x1 {
+    .sprite-position(@x1);
+  }
+  &.x2 {
+    .sprite-position(@x2);
+  }
+  &.x3 {
+    .sprite-position(@x3);
+  }
+  &.x4 {
+    .sprite-position(@x4);
+  }
+  &.x5 {
+    .sprite-position(@x5);
+  }
+  &.x6 {
+    .sprite-position(@x6);
+  }
+  &.x7 {
+    .sprite-position(@x7);
+  }
+  &.x8 {
+    .sprite-position(@x8);
+  }
+  &.x9 {
+    .sprite-position(@x9);
+  }
+  &.x10 {
+    .sprite-position(@x10);
+  }
+  &.x11 {
+    .sprite-position(@x11);
+  }
+  &.x12 {
+    .sprite-position(@x12);
+  }
+  &.x13 {
+    .sprite-position(@x13);
+  }
+  &.x14 {
+    .sprite-position(@x14);
+  }
+  &.x15 {
+    .sprite-position(@x15);
+  }
+  &.x16 {
+    .sprite-position(@x16);
+  }
 }
 
 .cursor-coordinate {
