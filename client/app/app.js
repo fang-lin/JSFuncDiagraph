@@ -20,9 +20,9 @@ define([
     var DELTA_SUM = 0;
     var ON = 'on', OFF = 'off';
     var EXPRESSIONS = [
-        ['y=x', 'f00'],
-        ['y=pow(x,2)', 'ff0'],
-        ['y=1/x']
+        ['y=x', 'f00']/*,
+         ['y=pow(x,2)', 'ff0'],
+         ['y=1/x']*/
     ];
     var SIZE;
 
