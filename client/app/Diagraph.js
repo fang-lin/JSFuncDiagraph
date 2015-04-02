@@ -168,15 +168,13 @@ define([
         var px, py,
             coords = [];
 
-        var maxDeltaRecount = 0,
-            fillCount = 0,
-            iterationCount = 0;
-
         var func = new Function(VAR_X, 'return ' + literal + ';');
 
         var x = range[0],
             y = func(x),
             dx = MAX_DELTA;
+
+        var iterationCount = 0;
 
         do {
             if (isNaN(y) || Math.abs(y) >= MAX_VALUE) {
@@ -198,12 +196,7 @@ define([
                         break;
                     }
 
-                    deltaRecount++;
-                } while (deltaRecount < MAX_DELTA_RECOUNT);
-
-                if (deltaRecount > maxDeltaRecount) {
-                    maxDeltaRecount = deltaRecount;
-                }
+                } while (deltaRecount++ < MAX_DELTA_RECOUNT);
             }
 
             if (isNaN(dx)) {
@@ -217,12 +210,9 @@ define([
                 px = offset[0] + x * zoom;
                 py = offset[1] - y * zoom;
                 coords.push(SMOOTH ? [px, py] : [Math.round(px), Math.round(py)]);
-                fillCount++;
             }
 
-            iterationCount++;
-
-        } while (x < range[2] && iterationCount < MAX_ITERATION);
+        } while (x < range[2] && iterationCount++ < MAX_ITERATION);
 
         return {
             redrawId: redrawId,
@@ -251,10 +241,6 @@ define([
             coords = [],
             domain = literal.domain;
 
-        var maxDeltaRecount = 0,
-            fillCount = 0,
-            iterationCount = 0;
-
         var funcX = new Function(VAR_Q, 'return ' + literal.x + ';'),
             funcY = new Function(VAR_Q, 'return ' + literal.y + ';');
 
@@ -263,7 +249,10 @@ define([
             y = funcY(q),
             dq = MAX_DELTA;
 
+        var iterationCount = 0;
+
         do {
+
             if (isNaN(x) || Math.abs(x) >= MAX_VALUE || isNaN(y) || Math.abs(y) >= MAX_VALUE) {
                 dq = MAX_DELTA;
             } else {
@@ -284,12 +273,7 @@ define([
                         break;
                     }
 
-                    deltaRecount++;
-                } while (deltaRecount < MAX_DELTA_RECOUNT);
-
-                if (deltaRecount > maxDeltaRecount) {
-                    maxDeltaRecount = deltaRecount;
-                }
+                } while (deltaRecount++ < MAX_DELTA_RECOUNT);
             }
 
             if (isNaN(dq)) {
@@ -304,12 +288,9 @@ define([
                 px = offset[0] + x * zoom;
                 py = offset[1] - y * zoom;
                 coords.push(SMOOTH ? [px, py] : [Math.round(px), Math.round(py)]);
-                fillCount++;
             }
 
-            iterationCount++;
-
-        } while (q < domain[1] && x < range[2] && iterationCount < MAX_ITERATION);
+        } while (q < domain[1] && iterationCount++ < MAX_ITERATION);
 
         return {
             redrawId: redrawId,
@@ -359,26 +340,28 @@ define([
         var self = this;
         var funcType = (expression.literal.domain ? 'parametric' : 'equation') + 'ToCoords';
         var arg = this.cwArg(expression);
-        var promis;
+        var promise;
         if (Diagraph.CW_ON) {
-            promis = this._drawingWorker[funcType](arg);
-            promis.then(function (result) {
+            promise = this._drawingWorker[funcType](arg);
+            promise.then(function (result) {
                 self.drawWithCoords(expression, result);
             });
         } else {
-            promis = this.drawWithCoords(expression, this[funcType](arg));
+            promise = this.drawWithCoords(expression, this[funcType](arg));
         }
 
-        return promis;
+        return promise;
     };
 
     _prototype_.drawExpressions = function () {
         var self = this;
         this._drawingWorker.clearQueue();
-        this._drawingCounter = 0;
         this.trigger('drawingStart');
+
         cw.all(this.expressions.map(function (expression) {
             return self.drawExpression(expression);
+        }).filter(function (promise) {
+            return promise;
         })).then(function () {
             self.trigger('drawingComplete');
         });

@@ -20,11 +20,16 @@ define([
     var DELTA_SUM = 0;
     var ON = 'on', OFF = 'off';
     var EXPRESSIONS = [
-        ['y=x', 'f00'],
-        ['y=pow(x,2)', 'ff0'],
-        ['y=1/x'],
-        ['x = 4*(sin(2*q)+0.2*sin(100*q))*cos(q);y = 4*(sin(2*q)+0.2*sin(100*q))*sin(q);q = [0, 8*PI]']
+        //['y=x', 'f00'],
+        //['y=pow(x,2)', 'ff0'],
+        //['y=1/x'],
+        ['x=4*(sin(2*q)+0.2*sin(100*q))*cos(q);y=4*(sin(2*q)+0.2*sin(100*q))*sin(q);q=[0,2*PI]', 'f00'],
+        ['x=4*cos(8*q)*cos(q);y=4*cos(8*q)*sin(q);q=[0,2*PI];', '0f0'],
+        ['x=4*cos(2*q)*cos(q);y=4*cos(2*q)*sin(q);q=[0,2*PI];', '0ff'],
+        ['x=q*cos(q);y=q*sin(q);q=[-1.5*PI,1.5*PI];', 'ff0'],
+        ['x=6*cos(q);y=3*sin(q);q=[0,2*PI];', 'f0f']
     ];
+
     var SIZE;
 
     var $window = $(window);
