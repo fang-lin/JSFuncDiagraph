@@ -104,6 +104,7 @@ body.dragging {
   background-position: -4px -382px;
 }
 #zoom-out-btn {
+  margin-right: -1px;
   background-position: -4px -1390px;
 }
 #zoom-out-btn:hover {

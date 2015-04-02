@@ -13,13 +13,12 @@ define([
 ], function (Diagraph, Palette, Expression, parser) {
     'use strict';
 
-    var ON = 'on';
-    var OFF = 'off';
     var RATIO = 1.4142135623730951;
-    var WHEEL_DAMP = 300;
+    var WHEEL_DAMP = 400;
     var ZOOM_LEVEL = 7;
     var ENABLE_CROSS_CURSOR = true;
     var DELTA_SUM = 0;
+    var ON = 'on', OFF = 'off';
     var EXPRESSIONS = [
         ['y=x', 'f00'],
         ['y=pow(x,2)', 'ff0'],
@@ -34,6 +33,9 @@ define([
     var $zoomLevel = $('#zoom-level'),
         $smoothBtn = $('#smooth-btn'),
         $cursorBtn = $('#cursor-btn'),
+        $centeredBtn = $('#centered-btn'),
+        $zoomInBtn = $('#zoom-in-btn'),
+        $zoomOutBtn = $('#zoom-out-btn'),
         $drawingState = $('#drawing-state'),
         $cursorX = $('#cursor-x'),
         $cursorY = $('#cursor-y');
@@ -76,7 +78,7 @@ define([
             diagraph.zoom(_zoom);
             diagraph.origin(parseOrigin(origin));
 
-            refreshState({});
+            refreshState();
 
             EXPRESSIONS.forEach(function (expr) {
                 diagraph.pushExpression(new Expression(expr[0], expr[1]));
@@ -85,7 +87,7 @@ define([
             diagraph.redraw(SIZE);
         },
         otherwise: function () {
-            refreshState({}, true);
+            refreshState(null, true);
         }
     });
 
@@ -129,22 +131,20 @@ define([
         onMouseMoveCrossCursor(event);
     });
 
-    $('#centered-btn').on('click', function (event) {
+    $centeredBtn.on('click', function (event) {
         event.stopPropagation();
         diagraph.redraw(false, 0);
-        refreshState({
-            origin: toOrigin(diagraph.origin())
-        });
+        refreshState({origin: toOrigin(diagraph.origin())});
     });
 
-    $('#zoom-in-btn').on('click', function (event) {
+    $zoomInBtn.on('click', function (event) {
         event.stopPropagation();
-        onZoom(1);
+        onZoom(1, true);
     });
 
-    $('#zoom-out-btn').on('click', function (event) {
+    $zoomOutBtn.on('click', function (event) {
         event.stopPropagation();
-        onZoom(-1);
+        onZoom(-1, true);
     });
 
     $smoothBtn.on('click', function (event) {
@@ -153,9 +153,7 @@ define([
         refreshSmoothBtn();
         $smoothBtn.html();
         diagraph.redraw();
-        refreshState({
-            enableSmooth: Diagraph.SMOOTH ? ON : OFF
-        });
+        refreshState({enableSmooth: Diagraph.SMOOTH ? ON : OFF});
     });
 
     $cursorBtn.on('click', function (event) {
@@ -166,25 +164,28 @@ define([
             $lineX.css('left', '-99999px');
             $lineY.css('top', '-99999px');
         }
-        refreshState({
-            enableCrossCursor: ENABLE_CROSS_CURSOR ? ON : OFF
-        });
+        refreshState({enableCrossCursor: ENABLE_CROSS_CURSOR ? ON : OFF});
     });
 
     function refreshSmoothBtn() {
         var title = 'Smooth: ' + (Diagraph.SMOOTH ? ON : OFF);
         $smoothBtn.html(title).attr('title', title);
-        Diagraph.SMOOTH ?
-            $smoothBtn.addClass(ON) :
+        if (Diagraph.SMOOTH) {
+            $smoothBtn.addClass(ON);
+        } else {
             $smoothBtn.removeClass(ON);
+        }
     }
 
     function refreshCrossCursorBtn() {
         var title = 'Cursor: ' + (ENABLE_CROSS_CURSOR ? ON : OFF);
         $cursorBtn.html(title).attr('title', title);
-        ENABLE_CROSS_CURSOR ?
-            $cursorBtn.addClass(ON) :
+
+        if (ENABLE_CROSS_CURSOR) {
+            $cursorBtn.addClass(ON);
+        } else {
             $cursorBtn.removeClass(ON);
+        }
     }
 
     function refreshZoomLevel() {
@@ -214,9 +215,7 @@ define([
         ];
         $canvas.css('transform', 'translate(0,0)');
         diagraph.redraw(false, offset);
-        refreshState({
-            origin: toOrigin(diagraph.origin())
-        });
+        refreshState({origin: toOrigin(diagraph.origin())});
     }
 
     function onMouseMoveCrossCursor(event) {
@@ -228,6 +227,36 @@ define([
         if (ENABLE_CROSS_CURSOR) {
             $lineX.css('left', event.clientX);
             $lineY.css('top', event.clientY);
+        }
+    }
+
+    function onZoom(delta, immed) {
+        var _delta = delta > 0 ? 1 : -1;
+
+        if (immed) {
+            DELTA_SUM = 0;
+            ZOOM_LEVEL += _delta;
+            refreshDiagraphZoom(_delta);
+        } else {
+            DELTA_SUM += delta;
+            if (Math.abs(DELTA_SUM) >= 1) {
+                DELTA_SUM = 0;
+                ZOOM_LEVEL += _delta;
+                refreshDiagraphZoom(_delta);
+            }
+        }
+    }
+
+    function refreshDiagraphZoom(delta) {
+        var zoom = parseZoom(ZOOM_LEVEL);
+        diagraph.zoom(zoom);
+
+        if (diagraph.zoom() === zoom) {
+            diagraph.redraw();
+            refreshZoomLevel();
+            refreshState({zoom: ZOOM_LEVEL});
+        } else {
+            ZOOM_LEVEL -= delta;
         }
     }
 
@@ -255,27 +284,6 @@ define([
             _state.expr,
             {trigger: !!trigger}
         );
-    }
-
-    function onZoom(delta) {
-        DELTA_SUM += delta;
-        if (Math.abs(DELTA_SUM) >= 1) {
-
-            var _delta = delta > 0 ? 1 : -1;
-            ZOOM_LEVEL += _delta;
-
-            var zoom = parseZoom(ZOOM_LEVEL);
-            diagraph.zoom(zoom);
-
-            if (diagraph.zoom() === zoom) {
-                diagraph.redraw();
-                refreshZoomLevel();
-                refreshState({zoom: ZOOM_LEVEL});
-            } else {
-                ZOOM_LEVEL -= _delta;
-            }
-            DELTA_SUM = 0;
-        }
     }
 
     function parseZoom(level) {
