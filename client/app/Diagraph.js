@@ -352,9 +352,6 @@ define([
             result.coords.forEach(function (coord) {
                 expression.canvas.fillRect(coord[0], coord[1], 1, 1);
             });
-            if (++this._drawingCounter === this.expressions.length) {
-                this.trigger('drawingComplete');
-            }
         }
     };
 
@@ -362,14 +359,17 @@ define([
         var self = this;
         var funcType = (expression.literal.domain ? 'parametric' : 'equation') + 'ToCoords';
         var arg = this.cwArg(expression);
-
+        var promis;
         if (Diagraph.CW_ON) {
-            this._drawingWorker[funcType](arg).then(function (result) {
+            promis = this._drawingWorker[funcType](arg);
+            promis.then(function (result) {
                 self.drawWithCoords(expression, result);
             });
         } else {
-            this.drawWithCoords(expression, this[funcType](arg));
+            promis = this.drawWithCoords(expression, this[funcType](arg));
         }
+
+        return promis;
     };
 
     _prototype_.drawExpressions = function () {
@@ -377,8 +377,10 @@ define([
         this._drawingWorker.clearQueue();
         this._drawingCounter = 0;
         this.trigger('drawingStart');
-        this.expressions.forEach(function (expression) {
-            self.drawExpression(expression);
+        cw.all(this.expressions.map(function (expression) {
+            return self.drawExpression(expression);
+        })).then(function () {
+            self.trigger('drawingComplete');
         });
     };
 
