@@ -7,33 +7,34 @@ define([], function () {
     'use strict';
 
     function Expression(literal, color) {
-        this.split(this.calibrate(this.trim(literal)));
         this.color = '#' + (color || '#333').replace(/#/g, '');
+        this.literal = {};
+        this.split(this.calibrate(this.trim(literal)));
     }
 
     Expression.MATH_FUNC = {
-        'Math.abs': /abs/g,
-        'Math.floor': /floor/g,
-        'Math.ceil': /ceil/g,
-        'Math.round': /round/g,
-        'Math.pow': /pow/g,
-        'Math.log': /log/g,
-        'Math.sin': /sin/g,
-        'Math.cos': /cos/g,
-        'Math.tan': /tan/g,
-        'Math.asin': /arcs/g,
-        'Math.acos': /arcc/g,
-        'Math.atan': /arct/g,
-        'Math.PI': /PI/g,
-        'Math.E': /E/g
+        'Math.abs': 'abs',
+        'Math.floor': 'floor',
+        'Math.ceil': 'ceil',
+        'Math.round': 'round',
+        'Math.pow': 'pow',
+        'Math.log': 'log',
+        'Math.sin': 'sin',
+        'Math.cos': 'cos',
+        'Math.tan': 'tan',
+        'Math.asin': 'arcs',
+        'Math.acos': 'arcc',
+        'Math.atan': 'arct',
+        'Math.PI': 'PI',
+        'Math.E': 'E'
     };
 
     Expression.VAR_X = 'x';
     Expression.VAR_Q = 'q';
     Expression.DOMAIN_REG = /q=\[(.+),(.+)]/;
-    Expression.Y_X_EXPR = /y=/;
-    Expression.Y_Q_EXPR = /y=/;
-    Expression.X_Q_EXPR = /x=/;
+    Expression.Y_X_REG = /y=.*x.*/;
+    Expression.Y_Q_REG = /y=.*q.*/;
+    Expression.X_Q_REG = /x=.*q.*/;
 
     var _prototype_ = Expression.prototype;
 
@@ -48,48 +49,64 @@ define([], function () {
         return func;
     };
 
+    _prototype_.patterns = [{
+        reg: Expression.DOMAIN_REG,
+        fn: function (group) {
+            if (group && group.length === 3) {
+                var lower = new Function('return ' + group[1]);
+                var upper = new Function('return ' + group[2]);
+                this.literal.domain = [lower(), upper()];
+                return false;
+            }
+            return true;
+        }
+    }, {
+        reg: Expression.Y_X_REG,
+        fn: function (group, literal) {
+            if (group && this.functional(literal, Expression.VAR_X)) {
+                this.literal = literal;
+                return false;
+            }
+            return true;
+        }
+    }, {
+        reg: Expression.Y_Q_REG,
+        fn: function (group, literal) {
+            if (group && this.functional(literal, Expression.VAR_Q)) {
+                this.literal.y = literal;
+                return false;
+            }
+            return true;
+        }
+    }, {
+        reg: Expression.X_Q_REG,
+        fn: function (group, literal) {
+            if (group && this.functional(literal, Expression.VAR_Q)) {
+                this.literal.x = literal;
+                return false;
+            }
+            return true;
+        }
+    }];
+
     _prototype_.split = function (literal) {
+        var self = this;
         var literals = literal.split(';')
             .map(function (item) {
                 return item;
             }).filter(function (item) {
                 return item;
             });
+        var patterns = self.patterns;
 
-        if (literals.length === 1) {
-            // 一般情况直接处理
-            if (this.functional(literals[0], Expression.VAR_X)) {
-                this.literal = literals[0];
-            }
-        } else if (literals.length > 1) {
-            // 有可能是一组方式或参数方程
-            literals.forEach(function (literal) {
-                // 通过正则表达式进行匹配和提取
-
-                //if (literal.indexOf(Expression.VAR_X) > -1) {
-                //    // 普通方程
-                //} else if (literal.indexOf(Expression.VAR_Q) > 1) {
-                //    // 参数方程
-                //} else if (literal.indexOf(Expression.VAR_Q) === 0) {
-                //    // 参数方程的值域
-                //}
-                //if (literal.indexOf(Expression.VAR_Q)) {
-                //
-                //}
-                //return literal.indexOf(Expression.VAR_Q) > 1;
-            });
-
-        }
-        //if (literals.length === 1) {
-        //    this.literal = literals[0];
-        //    this.func = this.functional(literals[0]);
-        //}
-        //if (literals.length === 3) {
-        //    //parametric equation
-        //    //todo: parametric equation
-        //    this.literals = literals;
-        //    this.domin = [0, 1];
-        //}
+        literals.forEach(function (literal) {
+            var i = 0, keep;
+            do {
+                var pattern = patterns[i];
+                keep = pattern.fn.call(self, literal.match(pattern.reg), literal);
+                i++;
+            } while (keep && i < patterns.length);
+        });
     };
 
     _prototype_.trim = function (literal) {

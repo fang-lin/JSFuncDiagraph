@@ -4,8 +4,9 @@
  */
 
 define([
+    'Expression',
     '../lib/catiline/dist/catiline'
-], function (cw) {
+], function (Expression, cw) {
     'use strict';
 
     function Diagraph($wrap, size) {
@@ -38,6 +39,7 @@ define([
     Diagraph.AXIS_COLOR = '#666';
     Diagraph.GRID_COLOR = '#eee';
     Diagraph.SMOOTH = true;
+    Diagraph.CW_ON = true;
 
     var _prototype_ = Diagraph.prototype;
 
@@ -136,11 +138,11 @@ define([
     };
 
     _prototype_.pushExpression = function (expression) {
-        console.log(expression);
-        if (typeof expression.func === 'function' && typeof expression.color === 'string') {
+        if (expression.literal && expression.color) {
             var $canvas = this.createLayer('expression');
             this.$wrap.append($canvas);
             expression.canvas = $canvas[0].getContext('2d');
+
             this.expressions.push(expression);
         }
         return this;
@@ -160,11 +162,8 @@ define([
             MAX_DELTA_RECOUNT = data.MAX_DELTA_RECOUNT,
             MIN_DELTA = data.MIN_DELTA,
             MAX_DELTA = (CHORD_FIELD[0] + CHORD_FIELD[1]) / 2 / zoom,
-            SMOOTH = data.SMOOTH;
-
-        var x = range[0],
-            y = null,
-            dx = MAX_DELTA;
+            SMOOTH = data.SMOOTH,
+            VAR_X = data.VAR_X;
 
         var px, py,
             coords = [];
@@ -173,14 +172,11 @@ define([
             fillCount = 0,
             iterationCount = 0;
 
-        var func;
+        var func = new Function(VAR_X, 'return ' + literal + ';');
 
-        try {
-            func = new Function('x', 'return ' + literal + ';');
-        } catch (e) {
-            func = null;
-            return [];
-        }
+        var x = range[0],
+            y = func(x),
+            dx = MAX_DELTA;
 
         do {
             if (isNaN(y) || Math.abs(y) >= MAX_VALUE) {
@@ -248,46 +244,43 @@ define([
             MAX_DELTA_RECOUNT = data.MAX_DELTA_RECOUNT,
             MIN_DELTA = data.MIN_DELTA,
             MAX_DELTA = (CHORD_FIELD[0] + CHORD_FIELD[1]) / 2 / zoom,
-            SMOOTH = data.SMOOTH;
-
-        var x = range[0],
-            y = null,
-            dx = MAX_DELTA;
+            SMOOTH = data.SMOOTH,
+            VAR_Q = data.VAR_Q;
 
         var px, py,
-            coords = [];
+            coords = [],
+            domain = literal.domain;
 
         var maxDeltaRecount = 0,
             fillCount = 0,
             iterationCount = 0;
 
-        var func;
+        var funcX = new Function(VAR_Q, 'return ' + literal.x + ';'),
+            funcY = new Function(VAR_Q, 'return ' + literal.y + ';');
 
-        try {
-            func = new Function('x', 'return ' + literal + ';');
-        } catch (err) {
-            console.error(err);
-            func = null;
-            return [];
-        }
+        var q = domain[0],
+            x = funcX(q),
+            y = funcY(q),
+            dq = MAX_DELTA;
 
         do {
-            if (isNaN(y) || Math.abs(y) >= MAX_VALUE) {
-                dx = MAX_DELTA;
+            if (isNaN(x) || Math.abs(x) >= MAX_VALUE || isNaN(y) || Math.abs(y) >= MAX_VALUE) {
+                dq = MAX_DELTA;
             } else {
                 var deltaRecount = 0;
                 do {
-                    var dy = y - func(x + dx);
+                    var dx = x - funcX(q + dq);
+                    var dy = y - funcY(q + dq);
                     var chord = Math.pow(Math.pow(dx, 2) + Math.pow(dy, 2), 0.5);
 
                     if (chord * zoom > CHORD_FIELD[0] && chord * zoom < CHORD_FIELD[1]) {
                         break;
                     } else {
-                        dx = Math.cos(Math.atan(dy / dx)) / zoom;
+                        dq = dq / chord / zoom;
                     }
 
-                    if (dx < MIN_DELTA) {
-                        dx = MIN_DELTA;
+                    if (dq < MIN_DELTA) {
+                        dq = MIN_DELTA;
                         break;
                     }
 
@@ -299,12 +292,13 @@ define([
                 }
             }
 
-            if (isNaN(dx)) {
-                dx = MIN_DELTA;
+            if (isNaN(dq)) {
+                dq = MIN_DELTA;
             }
 
-            x += dx;
-            y = func(x);
+            q += dq;
+            x = funcX(q);
+            y = funcY(q);
 
             if (y > range[3] && y < range[1]) {
                 px = offset[0] + x * zoom;
@@ -315,7 +309,7 @@ define([
 
             iterationCount++;
 
-        } while (x < range[2] && iterationCount < MAX_ITERATION);
+        } while (q < domain[1] && x < range[2] && iterationCount < MAX_ITERATION);
 
         return {
             redrawId: redrawId,
@@ -325,17 +319,17 @@ define([
 
     _prototype_.initDrawingWorker = function (workersSize) {
         this._drawingWorker = cw({
-            equation: this.equationToCoords,
-            parametric: this.parametricToCoords
-        }, workersSize);
+            equationToCoords: this.equationToCoords,
+            parametricToCoords: this.parametricToCoords
+        }, workersSize).on('error', function (err) {
+            console.log(err);
+        });
+
         return this;
     };
 
-    _prototype_.drawExpression = function (expression) {
-        var self = this;
-
-        // todo: check the expression whether or not parametric
-        this._drawingWorker.equation({
+    _prototype_.cwArg = function (expression) {
+        return {
             range: this._range,
             literal: expression.literal,
             offset: this._origin,
@@ -346,22 +340,36 @@ define([
             MAX_ITERATION: Diagraph.MAX_ITERATION,
             MAX_DELTA_RECOUNT: Diagraph.MAX_DELTA_RECOUNT,
             MIN_DELTA: Diagraph.MIN_DELTA,
-            SMOOTH: Diagraph.SMOOTH
-        }).then(function (result) {
-            if (result.redrawId === self._redrawId) {
-                expression.canvas.fillStyle = expression.color;
-                result.coords.forEach(function (coord) {
-                    expression.canvas.fillRect(coord[0], coord[1], 1, 1);
-                });
-                if (++self._drawingCounter === self.expressions.length) {
-                    self.trigger('drawingComplete');
-                }
-            }
-        });
+            SMOOTH: Diagraph.SMOOTH,
+            VAR_X: Expression.VAR_X,
+            VAR_Q: Expression.VAR_Q
+        };
     };
 
-    _prototype_.drawParametricExpression = function (expression) {
-        //todo: drawParametricExpression
+    _prototype_.drawWithCoords = function (expression, result) {
+        if (result.redrawId === this._redrawId) {
+            expression.canvas.fillStyle = expression.color;
+            result.coords.forEach(function (coord) {
+                expression.canvas.fillRect(coord[0], coord[1], 1, 1);
+            });
+            if (++this._drawingCounter === this.expressions.length) {
+                this.trigger('drawingComplete');
+            }
+        }
+    };
+
+    _prototype_.drawExpression = function (expression) {
+        var self = this;
+        var funcType = (expression.literal.domain ? 'parametric' : 'equation') + 'ToCoords';
+        var arg = this.cwArg(expression);
+
+        if (Diagraph.CW_ON) {
+            this._drawingWorker[funcType](arg).then(function (result) {
+                self.drawWithCoords(expression, result);
+            });
+        } else {
+            this.drawWithCoords(expression, this[funcType](arg));
+        }
     };
 
     _prototype_.drawExpressions = function () {
@@ -370,11 +378,7 @@ define([
         this._drawingCounter = 0;
         this.trigger('drawingStart');
         this.expressions.forEach(function (expression) {
-            if (expression.domin) {
-                self.drawParametricExpression(expression);
-            } else {
-                self.drawExpression(expression);
-            }
+            self.drawExpression(expression);
         });
     };
 
