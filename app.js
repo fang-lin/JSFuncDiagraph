@@ -36,8 +36,8 @@
         app.use(morgan(config.morgan));
         app.use(sendIndex);
 
-        app.listen(80, function () {
-            console.log('[server]', '[express]', 'Http server listening on port 80');
+        app.listen(config.port, function () {
+            console.log('[server]', '[express]', 'Http server listening on port', config.port);
         });
     }
 })();

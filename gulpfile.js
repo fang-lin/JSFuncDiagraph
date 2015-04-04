@@ -20,7 +20,7 @@ var gulp = require('gulp'),
     sh = require('shelljs'),
     path = require('path'),
     gulpIf = require('gulp-if'),
-    //sprite = require('css-sprite').stream,
+    sprite = require('css-sprite').stream,
     Q = require('q'),
     _ = require('underscore'),
     fs = require('fs'),
@@ -30,7 +30,7 @@ var gulp = require('gulp'),
 
 gulp.task('lint', function () {
     return gulp.src([
-        'server.js',
+        'app.js',
         'client/*.js',
         'client/app/*.js'
     ])
@@ -56,7 +56,7 @@ gulp.task('less', function () {
 
 gulp.task('nodemon', function () {
     nodemon({
-        script: 'server.js',
+        script: 'app.js',
         ext: 'js json',
         ignore: ['node_modules/*', 'client/*', 'dist/*'],
         env: {'NODE_ENV': 'DEVELOPMENT'}
@@ -150,7 +150,7 @@ gulp.task('copy', ['clean'], function () {
     return copy2([
         {src: 'client/index.html', dest: 'dist/'},
         {src: 'client/favicon.ico', dest: 'dist/'},
-        {src: 'client/images/*.*', dest: 'dist/images/'}
+        {src: 'client/img/*.*', dest: 'dist/img/'}
     ]);
 });
 

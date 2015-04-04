@@ -10,12 +10,19 @@ html, body {
   background: #ccc;
   overflow: hidden;
   cursor: crosshair;
+  font-family: consolas courier, monospace;
 }
 
 body.drag-start,
 body.dragging {
   cursor: move;
   .user-select(none);
+}
+
+button {
+  background-color: transparent;
+  border: medium none;
+  outline: medium none;
 }
 
 #tl-panel,
@@ -25,22 +32,14 @@ body.dragging {
   z-index: 10;
   button {
     .icon();
-    background-color: transparent;
     font-size: 0;
     line-height: 0;
-    border: medium none;
-    outline: medium none;
     width: 28px;
     height: 28px;
     padding: 0;
   }
   &:after {
-    content: ' ';
-    display: block;
-    height: 0;
-    line-height: 0;
-    font-size: 0;
-    clear: both;
+    .clear();
   }
 }
 
@@ -176,7 +175,7 @@ body.dragging {
 }
 
 .cursor-coordinate {
-  font-family: consolas courier, monospace;
+  font-size: 12px;
 }
 
 #tl-panel h1 {
@@ -226,6 +225,154 @@ body.dragging {
   top: -99999px;
   width: 100%;
   height: 1px;
+}
+
+#dashboard {
+  background: #eeeeee;
+  position: absolute;
+  overflow: hidden;
+  z-index: 10;
+  visibility: hidden;
+  top: -9999px;
+  right: -9999px;
+  cursor: default;
+  //  width: 640px;
+  border-style: solid;
+  border-color: #666666;
+  border-width: 0 0 1px 1px;
+  .border-radiuses(0, 0, 4px, 0);
+  .box-shadow(0 1px 8px rgba(0, 0, 0, 0.5));
+  button {
+    .icon();
+    font-size: 0;
+    line-height: 0;
+    padding: 0;
+    width: 16px;
+    height: 16px;
+  }
+  h2 {
+    margin: 10px 0 0 0;
+    font-size: 12px;
+    padding: 10px 20px;
+    background: #cccccc;
+    .title {
+      float: left;
+    }
+    .menu {
+      float: right;
+    }
+    &:after {
+      .clear();
+    }
+  }
+  #func-list {
+    list-style: none;
+    padding: 0;
+    margin: 0;
+    font-size: 12px;
+    li {
+      height: 100%;
+      border-bottom: solid #999 1px;
+      position: relative;
+      .col1 {
+        position: absolute;
+        padding: 7px 8px 8px 8px;
+        top: 0;
+        bottom: 0;
+        left: 0;
+        background: #fc8c84;
+        .show-on {
+          height: 17px;
+          display: block;
+          .sprite-position(@eye);
+          &:hover {
+            .sprite-position(@eye-hover);
+          }
+        }
+      }
+      .col2 {
+        margin: 0 42px 0 32px;
+        padding: 5px 8px;
+        p {
+          margin: 3px 0;
+          line-height: 16px;
+        }
+      }
+      .col3 {
+        position: absolute;
+        padding: 8px 10px 8px 0;
+        height: 16px;
+        top: 0;
+        right: 0;
+        bottom: 0;
+        button {
+          float: right;
+        }
+        .edit {
+          margin-right: -1px;
+          .sprite-position(@plus);
+          &:hover {
+            .sprite-position(@plus-hover);
+          }
+        }
+        .delete {
+          .sprite-position(@cross);
+          &:hover {
+            .sprite-position(@cross-hover);
+          }
+        }
+      }
+      &:after {
+        .clear();
+      }
+    }
+  }
+  #add-func {
+    padding: 10px 10px 0 30px;
+    font-size: 12px;
+    line-height: 16px;
+    span {
+      float: left;
+    }
+    button {
+      float: right;
+      .sprite-position(@plus);
+      &:hover {
+        .sprite-position(@plus-hover);
+      }
+    }
+    &:after {
+      .clear();
+    }
+  }
+  #dashboard-toggle {
+    &:after {
+      .clear();
+    }
+    button {
+      float: left;
+      .sprite-position(@corner-on);
+      &:hover {
+        .sprite-position(@corner-on-hover);
+      }
+    }
+  }
+  &.show {
+    visibility: visible;
+  }
+  &.animate {
+    .transition(~'top .15s .3s ease-in-out, right .15s ease-in-out');
+  }
+  &.on {
+    top: 0;
+    right: 0;
+    #dashboard-toggle button {
+      .sprite-position(@corner-off);
+      &:hover {
+        .sprite-position(@corner-off-hover);
+      }
+    }
+  }
 }
 
 #palette {

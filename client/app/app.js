@@ -16,18 +16,21 @@ define([
     var RATIO = 1.4142135623730951;
     var WHEEL_DAMP = 400;
     var ZOOM_LEVEL = 7;
-    var ENABLE_CROSS_CURSOR = true;
+    var CORNER_PADDING = 24;
+    var CURSOR_ON = true;
+    var DASHBOARD_ON = true;
     var DELTA_SUM = 0;
     var ON = 'on', OFF = 'off';
+    var STATE_ON = 'o', STATE_OFF = 'x';
     var EXPRESSIONS = [
         //['y=x', 'f00'],
-        //['y=pow(x,2)', 'ff0'],
+        ['y=10*sin(x)/x', 'f0f']
         //['y=1/x'],
-        ['x=4*(sin(2*q)+0.2*sin(100*q))*cos(q);y=4*(sin(2*q)+0.2*sin(100*q))*sin(q);q=[0,2*PI]', 'f00'],
-        ['x=4*cos(8*q)*cos(q);y=4*cos(8*q)*sin(q);q=[0,2*PI];', '0f0'],
-        ['x=4*cos(2*q)*cos(q);y=4*cos(2*q)*sin(q);q=[0,2*PI];', '0ff'],
-        ['x=q*cos(q);y=q*sin(q);q=[-1.5*PI,1.5*PI];', 'ff0'],
-        ['x=6*cos(q);y=3*sin(q);q=[0,2*PI];', 'f0f']
+        //['x=4*(sin(2*q)+0.2*sin(100*q))*cos(q);y=4*(sin(2*q)+0.2*sin(100*q))*sin(q);q=[0,2*PI]', 'f00'],
+        //['x=4*cos(8*q)*cos(q);y=4*cos(8*q)*sin(q);q=[0,2*PI];', '0f0'],
+        //['x=4*cos(2*q)*cos(q);y=4*cos(2*q)*sin(q);q=[0,2*PI];', '0ff'],
+        //['x=q*cos(q);y=q*sin(q);q=[-1.5*PI,1.5*PI];', 'ff0'],
+        //['x=6*cos(q);y=3*sin(q);q=[0,2*PI];', 'f0f']
     ];
 
     var SIZE;
@@ -42,6 +45,9 @@ define([
         $centeredBtn = $('#centered-btn'),
         $zoomInBtn = $('#zoom-in-btn'),
         $zoomOutBtn = $('#zoom-out-btn'),
+        $dashboard = $('#dashboard'),
+        $dashboardToggleBtn = $('#dashboard-toggle-btn'),
+
         $drawingState = $('#drawing-state'),
         $cursorX = $('#cursor-x'),
         $cursorY = $('#cursor-y');
@@ -63,23 +69,29 @@ define([
         $drawingState.html('drawing...');
     });
     diagraph.on('drawingComplete', function () {
-        $drawingState.html('complete.');
+        $drawingState.html('');
     });
 
     var Router = Backbone.Router.extend({
         routes: {
-            ':x/:y/:zoom/:enableSmooth/:enableCrossCursor/:exprCode': 'main',
+            ':x/:y/:zoom/:smoothOn/:cursorOn/:dashboardOn/:exprCode': 'main',
             '*otherwise': 'otherwise'
         },
-        main: function (x, y, zoom, enableSmooth, enableCrossCursor, exprCode) {
+        main: function (x, y, zoom, smoothOn, cursorOn, dashboardOn, exprCode) {
             var origin = [Math.round(x), Math.round(y)];
             var zoomLevel = Math.round(zoom);
             var _zoom = parseZoom(zoomLevel);
 
             ZOOM_LEVEL = zoomLevel;
-            Diagraph.SMOOTH = enableSmooth === ON;
-            ENABLE_CROSS_CURSOR = enableCrossCursor === ON;
+            Diagraph.SMOOTH = smoothOn === STATE_ON;
+            CURSOR_ON = cursorOn === STATE_ON;
+            DASHBOARD_ON = dashboardOn === STATE_ON;
             EXPRESSIONS = parser.decompress(exprCode);
+
+            refreshSmoothBtn(Diagraph.SMOOTH);
+            refreshCursorBtn(CURSOR_ON);
+            refreshDashboard(DASHBOARD_ON);
+            refreshZoomLevel(ZOOM_LEVEL);
 
             diagraph.zoom(_zoom);
             diagraph.origin(parseOrigin(origin));
@@ -101,15 +113,13 @@ define([
 
     Backbone.history.start({pushState: true});
 
-    refreshSmoothBtn();
-    refreshCrossCursorBtn();
-    refreshZoomLevel();
 
-    $('#bl-panel button, #br-panel button').on('mousedown', function (event) {
-        event.stopPropagation();
-    }).on('mouseup', function (event) {
-        event.stopPropagation();
-    });
+    $('#bl-panel button, #br-panel button, #dashboard')
+        .on('mousedown', function (event) {
+            event.stopPropagation();
+        }).on('mouseup', function (event) {
+            event.stopPropagation();
+        });
 
     $window.on('resize', _.throttle(function () {
         refreshSize();
@@ -156,48 +166,73 @@ define([
     $smoothBtn.on('click', function (event) {
         event.stopPropagation();
         Diagraph.SMOOTH = !Diagraph.SMOOTH;
-        refreshSmoothBtn();
-        $smoothBtn.html();
+        refreshSmoothBtn(Diagraph.SMOOTH);
         diagraph.redraw();
-        refreshState({enableSmooth: Diagraph.SMOOTH ? ON : OFF});
+        refreshState({smoothOn: Diagraph.SMOOTH ? STATE_ON : STATE_OFF});
     });
 
     $cursorBtn.on('click', function (event) {
         event.stopPropagation();
-        ENABLE_CROSS_CURSOR = !ENABLE_CROSS_CURSOR;
-        refreshCrossCursorBtn();
-        if (!ENABLE_CROSS_CURSOR) {
+        CURSOR_ON = !CURSOR_ON;
+        refreshCursorBtn(CURSOR_ON);
+        if (!CURSOR_ON) {
             $lineX.css('left', '-99999px');
             $lineY.css('top', '-99999px');
         }
-        refreshState({enableCrossCursor: ENABLE_CROSS_CURSOR ? ON : OFF});
+        refreshState({cursorOn: CURSOR_ON ? STATE_ON : STATE_OFF});
     });
 
-    function refreshSmoothBtn() {
-        var title = 'Smooth: ' + (Diagraph.SMOOTH ? ON : OFF);
+    $dashboardToggleBtn.on('click', function (event) {
+        event.stopPropagation();
+        DASHBOARD_ON = !DASHBOARD_ON;
+        $dashboard.addClass('animate');
+        refreshDashboard(DASHBOARD_ON);
+        refreshState({dashboardOn: DASHBOARD_ON ? STATE_ON : STATE_OFF});
+    });
+
+    function refreshSmoothBtn(soomth) {
+        var title = 'Smooth: ' + (soomth ? ON : OFF);
         $smoothBtn.html(title).attr('title', title);
-        if (Diagraph.SMOOTH) {
+
+        if (soomth) {
             $smoothBtn.addClass(ON);
         } else {
             $smoothBtn.removeClass(ON);
         }
     }
 
-    function refreshCrossCursorBtn() {
-        var title = 'Cursor: ' + (ENABLE_CROSS_CURSOR ? ON : OFF);
+    function refreshCursorBtn(cursorOn) {
+        var title = 'Cursor: ' + (cursorOn ? ON : OFF);
         $cursorBtn.html(title).attr('title', title);
 
-        if (ENABLE_CROSS_CURSOR) {
+        if (cursorOn) {
             $cursorBtn.addClass(ON);
         } else {
             $cursorBtn.removeClass(ON);
         }
     }
 
-    function refreshZoomLevel() {
-        var title = 'x' + ZOOM_LEVEL;
+    function refreshZoomLevel(zoomLevel) {
+        var title = 'x' + zoomLevel;
         $zoomLevel.html(title).attr('title', title);
-        $zoomLevel.removeClass().addClass('x' + ZOOM_LEVEL);
+        $zoomLevel.removeClass().addClass('x' + zoomLevel);
+    }
+
+    function refreshSize() {
+        SIZE = [$body.width(), $body.height()];
+    }
+
+    function refreshDashboard(dashboardOn) {
+        $dashboard.addClass('show');
+        if (dashboardOn) {
+            $dashboard.addClass(ON);
+            $dashboard.css('top', '').css('right', '');
+        } else {
+            $dashboard.removeClass(ON);
+            $dashboard
+                .css('top', '-' + ($dashboard.height() - CORNER_PADDING) + 'px')
+                .css('right', '-' + ($dashboard.width() - CORNER_PADDING) + 'px');
+        }
     }
 
     function onDragStart(event) {
@@ -230,7 +265,7 @@ define([
         var zoom = diagraph.zoom();
         $cursorX.html((event.clientX - origin[0]) / zoom);
         $cursorY.html((origin[1] - event.clientY) / zoom);
-        if (ENABLE_CROSS_CURSOR) {
+        if (CURSOR_ON) {
             $lineX.css('left', event.clientX);
             $lineY.css('top', event.clientY);
         }
@@ -259,7 +294,7 @@ define([
 
         if (diagraph.zoom() === zoom) {
             diagraph.redraw();
-            refreshZoomLevel();
+            refreshZoomLevel(ZOOM_LEVEL);
             refreshState({zoom: ZOOM_LEVEL});
         } else {
             ZOOM_LEVEL -= delta;
@@ -276,8 +311,9 @@ define([
         var _state = $.extend({
             origin: toOrigin(diagraph.origin()),
             zoom: Math.round(ZOOM_LEVEL),
-            enableSmooth: Diagraph.SMOOTH ? ON : OFF,
-            enableCrossCursor: ENABLE_CROSS_CURSOR ? ON : OFF,
+            enableSmooth: Diagraph.SMOOTH ? STATE_ON : STATE_OFF,
+            enableCrossCursor: CURSOR_ON ? STATE_ON : STATE_OFF,
+            dashboardOn: DASHBOARD_ON ? STATE_ON : STATE_OFF,
             expr: parser.compress(EXPRESSIONS)
         }, state);
 
@@ -287,6 +323,7 @@ define([
             _state.zoom + '/' +
             _state.enableSmooth + '/' +
             _state.enableCrossCursor + '/' +
+            _state.dashboardOn + '/' +
             _state.expr,
             {trigger: !!trigger}
         );
@@ -312,9 +349,5 @@ define([
             origin[0] - size[0] / 2,
             origin[1] - size[1] / 2
         ];
-    }
-
-    function refreshSize() {
-        SIZE = [$body.width(), $body.height()];
     }
 });
