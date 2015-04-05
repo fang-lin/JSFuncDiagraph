@@ -77,99 +77,99 @@ button {
   margin-right: 5px;
 }
 #centered-btn {
-  background-position: -4px -634px;
+  background-position: -4px -660px;
 }
 #centered-btn:hover {
-  background-position: -4px -454px;
+  background-position: -4px -480px;
 }
 #smooth-btn {
-  background-position: -4px -598px;
+  background-position: -4px -696px;
 }
 #smooth-btn:hover {
-  background-position: -4px -562px;
+  background-position: -4px -444px;
 }
 #smooth-btn.on {
-  background-position: -4px -670px;
+  background-position: -4px -768px;
 }
 #smooth-btn.on:hover {
-  background-position: -4px -346px;
+  background-position: -4px -732px;
 }
 #cursor-btn {
-  background-position: -4px -526px;
+  background-position: -4px -552px;
 }
 #cursor-btn:hover {
-  background-position: -4px -490px;
+  background-position: -4px -516px;
 }
 #cursor-btn.on {
-  background-position: -4px -418px;
+  background-position: -4px -624px;
 }
 #cursor-btn.on:hover {
-  background-position: -4px -382px;
+  background-position: -4px -588px;
 }
 #zoom-out-btn {
   margin-right: -1px;
-  background-position: -4px -1390px;
+  background-position: -4px -1488px;
 }
 #zoom-out-btn:hover {
-  background-position: -4px -1354px;
+  background-position: -4px -1452px;
 }
 #zoom-in-btn {
-  background-position: -4px -1318px;
+  background-position: -4px -1416px;
 }
 #zoom-in-btn:hover {
-  background-position: -4px -1282px;
+  background-position: -4px -1380px;
 }
 #zoom-level {
   margin-right: 5px;
-  background-position: -4px -706px;
+  background-position: -4px -804px;
 }
 #zoom-level.x1 {
-  background-position: -4px -706px;
+  background-position: -4px -804px;
 }
 #zoom-level.x2 {
-  background-position: -4px -994px;
+  background-position: -4px -1092px;
 }
 #zoom-level.x3 {
-  background-position: -4px -1030px;
+  background-position: -4px -1128px;
 }
 #zoom-level.x4 {
-  background-position: -4px -1066px;
+  background-position: -4px -1164px;
 }
 #zoom-level.x5 {
-  background-position: -4px -1102px;
+  background-position: -4px -1200px;
 }
 #zoom-level.x6 {
-  background-position: -4px -1138px;
+  background-position: -4px -1236px;
 }
 #zoom-level.x7 {
-  background-position: -4px -1174px;
+  background-position: -4px -1272px;
 }
 #zoom-level.x8 {
-  background-position: -4px -1210px;
+  background-position: -4px -1308px;
 }
 #zoom-level.x9 {
-  background-position: -4px -1246px;
+  background-position: -4px -1344px;
 }
 #zoom-level.x10 {
-  background-position: -4px -742px;
+  background-position: -4px -840px;
 }
 #zoom-level.x11 {
-  background-position: -4px -778px;
+  background-position: -4px -876px;
 }
 #zoom-level.x12 {
-  background-position: -4px -814px;
+  background-position: -4px -912px;
 }
 #zoom-level.x13 {
-  background-position: -4px -850px;
+  background-position: -4px -948px;
 }
 #zoom-level.x14 {
-  background-position: -4px -886px;
+  background-position: -4px -984px;
 }
 #zoom-level.x15 {
-  background-position: -4px -922px;
+  background-position: -4px -1020px;
 }
 #zoom-level.x16 {
-  background-position: -4px -958px;
+  background-position: -4px -1056px;
 }
 .cursor-coordinate {
   font-size: 12px;
@@ -191,7 +191,7 @@ button {
   position: absolute;
   background: transparent;
 }
-#mask {
+#cursor-layer {
   position: absolute;
   width: 100%;
   height: 100%;
@@ -227,6 +227,7 @@ button {
   overflow: hidden;
   z-index: 10;
   visibility: hidden;
+  width: 340px;
   top: -9999px;
   right: -9999px;
   cursor: default;
@@ -268,6 +269,7 @@ button {
 }
 #dashboard h2 .title {
   float: left;
+  line-height: 16px;
 }
 #dashboard h2 .menu {
   float: right;
@@ -299,13 +301,13 @@ button {
   left: 0;
   background: #fc8c84;
 }
-#dashboard #func-list li .col1 .show-on {
+#dashboard #func-list li .col1 .show-on-btn {
   height: 17px;
   display: block;
-  background-position: -4px -244px;
+  background-position: -4px -340px;
 }
-#dashboard #func-list li .col1 .show-on:hover {
-  background-position: -4px -320px;
+#dashboard #func-list li .col1 .show-on-btn:hover {
+  background-position: -4px -418px;
 }
 #dashboard #func-list li .col2 {
   margin: 0 42px 0 32px;
@@ -326,18 +328,18 @@ button {
 #dashboard #func-list li .col3 button {
   float: right;
 }
-#dashboard #func-list li .col3 .edit {
+#dashboard #func-list li .col3 .edit-btn {
   margin-right: -1px;
-  background-position: -4px -28px;
+  background-position: -4px -244px;
 }
-#dashboard #func-list li .col3 .edit:hover {
-  background-position: -4px -220px;
+#dashboard #func-list li .col3 .edit-btn:hover {
+  background-position: -4px -4px;
 }
-#dashboard #func-list li .col3 .delete {
-  background-position: -4px -124px;
+#dashboard #func-list li .col3 .delete-btn {
+  background-position: -4px -172px;
 }
-#dashboard #func-list li .col3 .delete:hover {
-  background-position: -4px -100px;
+#dashboard #func-list li .col3 .delete-btn:hover {
+  background-position: -4px -148px;
 }
 #dashboard #func-list li:after {
   content: ' ';
@@ -350,17 +352,17 @@ button {
 #dashboard #add-func {
   padding: 10px 10px 0 30px;
   font-size: 12px;
-  line-height: 16px;
 }
 #dashboard #add-func span {
   float: left;
+  line-height: 16px;
 }
 #dashboard #add-func button {
   float: right;
   background-position: -4px -28px;
 }
 #dashboard #add-func button:hover {
-  background-position: -4px -220px;
+  background-position: -4px -268px;
 }
 #dashboard #add-func:after {
   content: ' ';
@@ -370,6 +372,13 @@ button {
   font-size: 0;
   clear: both;
 }
+#dashboard #dashboard-toggle button {
+  float: left;
+  background-position: -4px -100px;
+}
+#dashboard #dashboard-toggle button:hover {
+  background-position: -4px -76px;
+}
 #dashboard #dashboard-toggle:after {
   content: ' ';
   display: block;
@@ -377,13 +386,6 @@ button {
   line-height: 0;
   font-size: 0;
   clear: both;
-}
-#dashboard #dashboard-toggle button {
-  float: left;
-  background-position: -4px -76px;
-}
-#dashboard #dashboard-toggle button:hover {
-  background-position: -4px -52px;
 }
 #dashboard.show {
   visibility: visible;
@@ -399,29 +401,174 @@ button {
   right: 0;
 }
 #dashboard.on #dashboard-toggle button {
-  background-position: -4px -148px;
+  background-position: -4px -52px;
 }
 #dashboard.on #dashboard-toggle button:hover {
-  background-position: -4px -4px;
+  background-position: -4px -220px;
 }
-#palette {
-  width: 384px;
+#func-editor-bg {
+  position: absolute;
+  width: 100%;
+  height: 100%;
+  background: rgba(0, 0, 0, 0.3);
+  display: none;
+  z-index: 11;
 }
-#palette a {
-  float: left;
-  width: 4px;
-  height: 4px;
-  border-width: 1px;
+#func-editor-bg.on {
+  display: block;
+}
+#func-editor-wrap {
+  position: relative;
+  margin: 0 auto;
+  width: 372px;
+}
+#func-editor {
+  -webkit-transition: all 0.1s;
+  -moz-transition: all 0.1s;
+  -ms-transition: all 0.1s;
+  -o-transition: all 0.1s;
+  position: absolute;
+  background: #eeeeee;
+  margin: 0 auto;
+  z-index: 20;
+  width: 372px;
+  cursor: default;
+  visibility: hidden;
+  top: -9999px;
+  left: 0;
   border-style: solid;
+  border-color: #666666;
+  border-width: 0 1px 1px 1px;
+  -webkit-border-top-right-radius: 0;
+  -webkit-border-bottom-right-radius: 4px;
+  -webkit-border-bottom-left-radius: 4px;
+  -webkit-border-top-left-radius: 0;
+  -moz-border-radius-topright: 0;
+  -moz-border-radius-bottomright: 4px;
+  -moz-border-radius-bottomleft: 4px;
+  -moz-border-radius-topleft: 0;
+  border-top-right-radius: 0;
+  border-bottom-right-radius: 4px;
+  border-bottom-left-radius: 4px;
+  border-top-left-radius: 0;
+  -moz-background-clip: padding;
+  -webkit-background-clip: padding-box;
+  background-clip: padding-box;
+  -webkit-box-shadow: 0 1px 8px rgba(0, 0, 0, 0.5);
+  -moz-box-shadow: 0 1px 8px rgba(0, 0, 0, 0.5);
+  box-shadow: 0 1px 8px rgba(0, 0, 0, 0.5);
 }
-#palette a:hover {
-  border-color: #ffffff !important;
+#func-editor.show {
+  visibility: visible;
 }
-#palette:after {
+#func-editor.animate {
+  -webkit-transition: all ease-in-out 0.15s;
+  -moz-transition: all ease-in-out 0.15s;
+  -ms-transition: all ease-in-out 0.15s;
+  -o-transition: all ease-in-out 0.15s;
+}
+#func-editor.on {
+  top: 0;
+  right: 0;
+}
+#func-editor.on #dashboard-toggle button {
+  background-position: -4px -52px;
+}
+#func-editor.on #dashboard-toggle button:hover {
+  background-position: -4px -220px;
+}
+#func-editor button {
+  background-image: url('../img/buttons.png');
+  font-size: 0;
+  line-height: 0;
+  padding: 0;
+  width: 16px;
+  height: 16px;
+}
+#func-editor h2 {
+  margin: 10px 0 0 0;
+  font-size: 12px;
+  padding: 10px 20px;
+  background: #cccccc;
+}
+#func-editor h2 .title {
+  float: left;
+  line-height: 16px;
+}
+#func-editor h2 #close-func-editor-btn {
+  float: right;
+  background-position: -4px -196px;
+}
+#func-editor h2 #close-func-editor-btn:hover {
+  background-position: -4px -124px;
+}
+#func-editor h2:after {
   content: ' ';
   display: block;
   height: 0;
-  font-size: 0;
   line-height: 0;
+  font-size: 0;
+  clear: both;
+}
+#func-editor #func-textarea-wrap {
+  padding: 10px 20px;
+}
+#func-editor #func-textarea-wrap textarea {
+  outline: medium none;
+  border: solid 1px #999999;
+  padding: 5px;
+  font-size: 12px;
+  line-height: 16px;
+  display: block;
+  width: 320px;
+  height: 96px;
+  resize: none;
+}
+#func-editor #func-textarea-wrap:after {
+  content: ' ';
+  display: block;
+  height: 0;
+  line-height: 0;
+  font-size: 0;
+  clear: both;
+}
+#func-editor #footer {
+  padding: 0 20px 20px 20px;
+}
+#func-editor #footer #palette {
+  float: left;
+  width: 288px;
+}
+#func-editor #footer #palette a {
+  float: left;
+  width: 6px;
+  height: 6px;
+  cursor: pointer;
+  border-width: 1px;
+  border-style: solid;
+}
+#func-editor #footer #palette a.selected {
+  border-color: #ffffff !important;
+}
+#func-editor #footer #palette a.bright.selected {
+  border-color: #000000 !important;
+}
+#func-editor #footer #palette:after {
+  content: ' ';
+  display: block;
+  height: 0;
+  line-height: 0;
+  font-size: 0;
+  clear: both;
+}
+#func-editor #footer #submit-btn {
+  float: right;
+}
+#func-editor #footer:after {
+  content: ' ';
+  display: block;
+  height: 0;
+  line-height: 0;
+  font-size: 0;
   clear: both;
 }

@@ -19,13 +19,14 @@ define([
     var CORNER_PADDING = 24;
     var CURSOR_ON = true;
     var DASHBOARD_ON = true;
+    var EDITOR_ON = false;
     var DELTA_SUM = 0;
     var ON = 'on', OFF = 'off';
     var STATE_ON = 'o', STATE_OFF = 'x';
     var EXPRESSIONS = [
         //['y=x', 'f00'],
-        ['y=10*sin(x)/x', 'f0f']
-        //['y=1/x'],
+        //['y=10*sin(x)/x', 'f0f'],
+        ['y=1/x', '393']
         //['x=4*(sin(2*q)+0.2*sin(100*q))*cos(q);y=4*(sin(2*q)+0.2*sin(100*q))*sin(q);q=[0,2*PI]', 'f00'],
         //['x=4*cos(8*q)*cos(q);y=4*cos(8*q)*sin(q);q=[0,2*PI];', '0f0'],
         //['x=4*cos(2*q)*cos(q);y=4*cos(2*q)*sin(q);q=[0,2*PI];', '0ff'],
@@ -47,6 +48,13 @@ define([
         $zoomOutBtn = $('#zoom-out-btn'),
         $dashboard = $('#dashboard'),
         $dashboardToggleBtn = $('#dashboard-toggle-btn'),
+        $funcList = $('#func-list'),
+        $editor = $('#func-editor'),
+        $editorBg = $('#func-editor-bg'),
+        $addFuncBtn = $('#add-func-btn'),
+        $closeEditorBtn = $('#close-func-editor-btn'),
+        $editBtns = $('.edit-btn'),
+        $deleteBtns = $('.delete-btn'),
 
         $drawingState = $('#drawing-state'),
         $cursorX = $('#cursor-x'),
@@ -54,6 +62,8 @@ define([
 
     var $lineX = $('#line-x'),
         $lineY = $('#line-y');
+
+    var compiled = _.template($('#func-list-template').html());
 
     var drag = {
         client: [],
@@ -63,7 +73,7 @@ define([
     refreshSize();
 
     var diagraph = new Diagraph($canvas, SIZE);
-    //var palette = new Palette($('#palette'));
+    var palette = new Palette($('#palette'));
 
     diagraph.on('drawingStart', function () {
         $drawingState.html('drawing...');
@@ -91,6 +101,7 @@ define([
             refreshSmoothBtn(Diagraph.SMOOTH);
             refreshCursorBtn(CURSOR_ON);
             refreshDashboard(DASHBOARD_ON);
+            refreshEditor(EDITOR_ON);
             refreshZoomLevel(ZOOM_LEVEL);
 
             diagraph.zoom(_zoom);
@@ -99,8 +110,11 @@ define([
             refreshState();
 
             EXPRESSIONS.forEach(function (expr) {
-                diagraph.pushExpression(new Expression(expr[0], expr[1]));
+                var expression = new Expression(expr[0], expr[1]);
+                diagraph.pushExpression(expression);
             });
+
+            $funcList.html(compiled({list: diagraph.expressions}));
 
             diagraph.redraw(SIZE);
         },
@@ -113,11 +127,12 @@ define([
 
     Backbone.history.start({pushState: true});
 
-
-    $('#bl-panel button, #br-panel button, #dashboard')
+    $('#bl-panel button, #br-panel button, #dashboard, #func-editor, #func-editor-bg')
         .on('mousedown', function (event) {
             event.stopPropagation();
         }).on('mouseup', function (event) {
+            event.stopPropagation();
+        }).on('mousewheel', function (event) {
             event.stopPropagation();
         });
 
@@ -176,8 +191,8 @@ define([
         CURSOR_ON = !CURSOR_ON;
         refreshCursorBtn(CURSOR_ON);
         if (!CURSOR_ON) {
-            $lineX.css('left', '-99999px');
-            $lineY.css('top', '-99999px');
+            $lineX.css('left', '99999px');
+            $lineY.css('top', '99999px');
         }
         refreshState({cursorOn: CURSOR_ON ? STATE_ON : STATE_OFF});
     });
@@ -188,6 +203,32 @@ define([
         $dashboard.addClass('animate');
         refreshDashboard(DASHBOARD_ON);
         refreshState({dashboardOn: DASHBOARD_ON ? STATE_ON : STATE_OFF});
+    });
+
+    $addFuncBtn.on('click', function (event) {
+        event.stopPropagation();
+        if (!EDITOR_ON) {
+            EDITOR_ON = true;
+            $editor.addClass('animate');
+            refreshEditor(EDITOR_ON);
+        }
+    });
+
+    $editBtns.on('click', function (event) {
+        event.stopPropagation();
+        if (!EDITOR_ON) {
+            EDITOR_ON = true;
+            $editor.addClass('animate');
+            refreshEditor(EDITOR_ON);
+        }
+    });
+
+    $closeEditorBtn.on('click', function (event) {
+        event.stopPropagation();
+        if (EDITOR_ON) {
+            EDITOR_ON = false;
+            refreshEditor(EDITOR_ON);
+        }
     });
 
     function refreshSmoothBtn(soomth) {
@@ -232,6 +273,19 @@ define([
             $dashboard
                 .css('top', '-' + ($dashboard.height() - CORNER_PADDING) + 'px')
                 .css('right', '-' + ($dashboard.width() - CORNER_PADDING) + 'px');
+        }
+    }
+
+    function refreshEditor(editorOn) {
+        $editor.addClass('show');
+        if (editorOn) {
+            $editor.addClass(ON);
+            $editorBg.addClass(ON);
+            $editor.css('top', '');
+        } else {
+            $editor.removeClass(ON);
+            $editorBg.removeClass(ON);
+            $editor.css('top', '-' + ($editor.height() + CORNER_PADDING) + 'px');
         }
     }
 

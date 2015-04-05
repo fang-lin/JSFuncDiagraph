@@ -196,7 +196,7 @@ button {
   background: transparent;
 }
 
-#mask {
+#cursor-layer {
   position: absolute;
   width: 100%;
   height: 100%;
@@ -233,10 +233,10 @@ button {
   overflow: hidden;
   z-index: 10;
   visibility: hidden;
+  width: 340px;
   top: -9999px;
   right: -9999px;
   cursor: default;
-  //  width: 640px;
   border-style: solid;
   border-color: #666666;
   border-width: 0 0 1px 1px;
@@ -257,6 +257,7 @@ button {
     background: #cccccc;
     .title {
       float: left;
+      line-height: 16px;
     }
     .menu {
       float: right;
@@ -281,7 +282,7 @@ button {
         bottom: 0;
         left: 0;
         background: #fc8c84;
-        .show-on {
+        .show-on-btn {
           height: 17px;
           display: block;
           .sprite-position(@eye);
@@ -308,17 +309,17 @@ button {
         button {
           float: right;
         }
-        .edit {
+        .edit-btn {
           margin-right: -1px;
-          .sprite-position(@plus);
+          .sprite-position(@edit-l);
           &:hover {
-            .sprite-position(@plus-hover);
+            .sprite-position(@edit-l-hover);
           }
         }
-        .delete {
-          .sprite-position(@cross);
+        .delete-btn {
+          .sprite-position(@cross-r);
           &:hover {
-            .sprite-position(@cross-hover);
+            .sprite-position(@cross-r-hover);
           }
         }
       }
@@ -330,9 +331,9 @@ button {
   #add-func {
     padding: 10px 10px 0 30px;
     font-size: 12px;
-    line-height: 16px;
     span {
       float: left;
+      line-height: 16px;
     }
     button {
       float: right;
@@ -346,15 +347,15 @@ button {
     }
   }
   #dashboard-toggle {
-    &:after {
-      .clear();
-    }
     button {
       float: left;
       .sprite-position(@corner-on);
       &:hover {
         .sprite-position(@corner-on-hover);
       }
+    }
+    &:after {
+      .clear();
     }
   }
   &.show {
@@ -375,27 +376,131 @@ button {
   }
 }
 
-#palette {
-  width: 384px;
+#func-editor-bg {
+  position: absolute;
+  width: 100%;
+  height: 100%;
+  background: rgba(0, 0, 0, .3);
+  display: none;
+  z-index: 11;
+  &.on {
+    display: block;
+  }
 }
 
-#palette a {
-  float: left;
-  width: 4px;
-  height: 4px;
-  border-width: 1px;
+#func-editor-wrap {
+  position: relative;
+  margin: 0 auto;
+  width: 372px;
+}
+
+#func-editor {
+  .transition(all .1s);
+  position: absolute;
+  background: #eeeeee;
+  margin: 0 auto;
+  z-index: 20;
+  width: 372px;
+  cursor: default;
+  visibility: hidden;
+  top: -9999px;
+  left: 0;
   border-style: solid;
-}
-
-#palette a:hover {
-  border-color: #ffffff !important;
-}
-
-#palette:after {
-  content: ' ';
-  display: block;
-  height: 0;
-  font-size: 0;
-  line-height: 0;
-  clear: both;
+  border-color: #666666;
+  border-width: 0 1px 1px 1px;
+  .border-radiuses(0, 4px, 4px, 0);
+  .box-shadow(0 1px 8px rgba(0, 0, 0, 0.5));
+  &.show {
+    visibility: visible;
+  }
+  &.animate {
+    .transition(all ease-in-out .15s);
+  }
+  &.on {
+    top: 0;
+    right: 0;
+    #dashboard-toggle button {
+      .sprite-position(@corner-off);
+      &:hover {
+        .sprite-position(@corner-off-hover);
+      }
+    }
+  }
+  button {
+    .icon();
+    font-size: 0;
+    line-height: 0;
+    padding: 0;
+    width: 16px;
+    height: 16px;
+  }
+  h2 {
+    margin: 10px 0 0 0;
+    font-size: 12px;
+    padding: 10px 20px;
+    background: #cccccc;
+    .title {
+      float: left;
+      line-height: 16px;
+    }
+    #close-func-editor-btn {
+      float: right;
+      .sprite-position(@cross);
+      &:hover {
+        .sprite-position(@cross-hover);
+      }
+    }
+    &:after {
+      .clear();
+    }
+  }
+  #func-textarea-wrap {
+    padding: 10px 20px;
+    textarea {
+      outline: medium none;
+      border: solid 1px #999999;
+      padding: 5px;
+      font-size: 12px;
+      line-height: 16px;
+      display: block;
+      width: 320px;
+      height: 96px;
+      resize: none;
+    }
+    &:after {
+      .clear();
+    }
+  }
+  #footer {
+    padding: 0 20px 20px 20px;
+    #palette {
+      float: left;
+      width: 288px;
+      a {
+        float: left;
+        width: 6px;
+        height: 6px;
+        cursor: pointer;
+        border-width: 1px;
+        border-style: solid;
+        &:hover {
+        }
+        &.selected {
+          border-color: #ffffff !important;
+        }
+        &.bright.selected {
+          border-color: #000000 !important;
+        }
+      }
+      &:after {
+        .clear();
+      }
+    }
+    #submit-btn {
+      float: right;
+    }
+    &:after {
+      .clear();
+    }
+  }
 }

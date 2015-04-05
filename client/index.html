@@ -17,7 +17,6 @@
     <title>JSFuncDiagraph v2</title>
 </head>
 <body>
-<div id="palette"></div>
 <div id="tl-panel">
     <h1>JSFuncDiagraph v2 <span id="drawing-state"></span></h1>
 
@@ -35,7 +34,7 @@
     <ul id="func-list">
         <li>
             <div class="col1">
-                <button class="show-on"></button>
+                <button class="show-on-btn"></button>
             </div>
             <div class="col2">
                 <p>x = 4 * (sin(2 * q) + 0.2 * sin(100 * q)) * cos(q)</p>
@@ -45,176 +44,44 @@
                 <p>q = [0,2 * PI]</p>
             </div>
             <div class="col3">
-                <button class="delete" title="Delete">Delete</button>
-                <button class="edit" title="Edit">Edit</button>
+                <button class="delete-btn" title="Delete">Delete</button>
+                <button class="edit-btn" title="Edit">Edit</button>
             </div>
         </li>
         <li>
             <div class="col1">
-                <button class="show-on" title="Show: -">Show: -</button>
+                <button class="show-on-btn" title="Show: -">Show: -</button>
             </div>
             <div class="col2">
                 <p>y=pow(x,2)</p>
             </div>
             <div class="col3">
-                <button class="delete" title="Delete">Delete</button>
-                <button class="edit" title="Edit">Edit</button>
+                <button class="delete-btn" title="Delete">Delete</button>
+                <button class="edit-btn" title="Edit">Edit</button>
             </div>
         </li>
         <li>
             <div class="col1">
-                <button class="show-on" title="Show: -">Show: -</button>
+                <button class="show-on-btn" title="Show: -">Show: -</button>
             </div>
             <div class="col2">
                 <p>y=pow(x,2)</p>
             </div>
             <div class="col3">
-                <button class="delete" title="Delete">Delete</button>
-                <button class="edit" title="Edit">Edit</button>
+                <button class="delete-btn" title="Delete">Delete</button>
+                <button class="edit-btn" title="Edit">Edit</button>
             </div>
         </li>
         <li>
             <div class="col1">
-                <button class="show-on" title="Show: -">Show: -</button>
+                <button class="show-on-btn" title="Show: -">Show: -</button>
             </div>
             <div class="col2">
                 <p>y=pow(x,2)</p>
             </div>
             <div class="col3">
-                <button class="delete" title="Delete">Delete</button>
-                <button class="edit" title="Edit">Edit</button>
-            </div>
-        </li>
-        <li>
-            <div class="col1">
-                <button class="show-on" title="Show: -">Show: -</button>
-            </div>
-            <div class="col2">
-                <p>y=pow(x,2)</p>
-            </div>
-            <div class="col3">
-                <button class="delete" title="Delete">Delete</button>
-                <button class="edit" title="Edit">Edit</button>
-            </div>
-        </li>
-        <li>
-            <div class="col1">
-                <button class="show-on" title="Show: -">Show: -</button>
-            </div>
-            <div class="col2">
-                <p>y=pow(x,2)</p>
-            </div>
-            <div class="col3">
-                <button class="delete" title="Delete">Delete</button>
-                <button class="edit" title="Edit">Edit</button>
-            </div>
-        </li>
-        <li>
-            <div class="col1">
-                <button class="show-on" title="Show: -">Show: -</button>
-            </div>
-            <div class="col2">
-                <p>y=pow(x,2)</p>
-            </div>
-            <div class="col3">
-                <button class="delete" title="Delete">Delete</button>
-                <button class="edit" title="Edit">Edit</button>
-            </div>
-        </li>
-        <li>
-            <div class="col1">
-                <button class="show-on" title="Show: -">Show: -</button>
-            </div>
-            <div class="col2">
-                <p>y=pow(x,2)</p>
-            </div>
-            <div class="col3">
-                <button class="delete" title="Delete">Delete</button>
-                <button class="edit" title="Edit">Edit</button>
-            </div>
-        </li>
-        <li>
-            <div class="col1">
-                <button class="show-on" title="Show: -">Show: -</button>
-            </div>
-            <div class="col2">
-                <p>y=pow(x,2)</p>
-            </div>
-            <div class="col3">
-                <button class="delete" title="Delete">Delete</button>
-                <button class="edit" title="Edit">Edit</button>
-            </div>
-        </li>
-        <li>
-            <div class="col1">
-                <button class="show-on" title="Show: -">Show: -</button>
-            </div>
-            <div class="col2">
-                <p>y=pow(x,2)</p>
-            </div>
-            <div class="col3">
-                <button class="delete" title="Delete">Delete</button>
-                <button class="edit" title="Edit">Edit</button>
-            </div>
-        </li>
-        <li>
-            <div class="col1">
-                <button class="show-on" title="Show: -">Show: -</button>
-            </div>
-            <div class="col2">
-                <p>y=pow(x,2)</p>
-            </div>
-            <div class="col3">
-                <button class="delete" title="Delete">Delete</button>
-                <button class="edit" title="Edit">Edit</button>
-            </div>
-        </li>
-        <li>
-            <div class="col1">
-                <button class="show-on" title="Show: -">Show: -</button>
-            </div>
-            <div class="col2">
-                <p>y=pow(x,2)</p>
-            </div>
-            <div class="col3">
-                <button class="delete" title="Delete">Delete</button>
-                <button class="edit" title="Edit">Edit</button>
-            </div>
-        </li>
-        <li>
-            <div class="col1">
-                <button class="show-on" title="Show: -">Show: -</button>
-            </div>
-            <div class="col2">
-                <p>y=pow(x,2)</p>
-            </div>
-            <div class="col3">
-                <button class="delete" title="Delete">Delete</button>
-                <button class="edit" title="Edit">Edit</button>
-            </div>
-        </li>
-        <li>
-            <div class="col1">
-                <button class="show-on" title="Show: -">Show: -</button>
-            </div>
-            <div class="col2">
-                <p>y=pow(x,2)</p>
-            </div>
-            <div class="col3">
-                <button class="delete" title="Delete">Delete</button>
-                <button class="edit" title="Edit">Edit</button>
-            </div>
-        </li>
-        <li>
-            <div class="col1">
-                <button class="show-on" title="Show: -">Show: -</button>
-            </div>
-            <div class="col2">
-                <p>y=pow(x,2)</p>
-            </div>
-            <div class="col3">
-                <button class="delete" title="Delete">Delete</button>
-                <button class="edit" title="Edit">Edit</button>
+                <button class="delete-btn" title="Delete">Delete</button>
+                <button class="edit-btn" title="Edit">Edit</button>
             </div>
         </li>
     </ul>
@@ -236,11 +103,51 @@
     <button id="zoom-out-btn" title="Zoom Out">Zoom Out</button>
     <button id="zoom-level" title="x7" class="x7">x7</button>
 </div>
-<div id="mask">
+<div id="func-editor-bg"></div>
+<div id="func-editor-wrap">
+    <div id="func-editor">
+        <h2>
+            <span class="title">Edit Function</span>
+            <button id="close-func-editor-btn"></button>
+        </h2>
+        <div id="func-textarea-wrap">
+            <textarea name="" id="func-textarea" cols="30" rows="5"></textarea>
+        </div>
+        <div id="footer">
+            <div id="palette"></div>
+            <button id="submit-btn"></button>
+        </div>
+    </div>
+</div>
+<div id="cursor-layer">
     <hr id="line-x"/>
     <hr id="line-y"/>
 </div>
 <div id="canvas"></div>
 <script type="text/javascript" data-main="init" src="lib/requirejs/require.js"></script>
 </body>
+<script type="text/template" id="func-list-template">
+    <% list.forEach(function(expr){ %>
+    <li>
+        <div class="col1" style="background: <%= expr.color %>">
+            <button class="show-on-btn"></button>
+        </div>
+        <div class="col2">
+            <% if(expr.expression.domain){ %>
+            <p><%= expr.expression.x %></p>
+
+            <p><%= expr.expression.y %></p>
+
+            <p><%= expr.expression.domain %></p>
+            <% }else{ %>
+            <p><%= expr.expression %></p>
+            <% } %>
+        </div>
+        <div class="col3">
+            <button class="delete-btn" title="Delete">Delete</button>
+            <button class="edit-btn" title="Edit">Edit</button>
+        </div>
+    </li>
+    <% }) %>
+</script>
 </html>

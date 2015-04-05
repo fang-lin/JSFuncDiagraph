@@ -9,6 +9,7 @@ define([], function () {
     function Expression(literal, color) {
         this.color = '#' + (color || '#333').replace(/#/g, '');
         this.literal = {};
+        this.expression = {};
         this.split(this.calibrate(this.trim(literal)));
     }
 
@@ -27,6 +28,15 @@ define([], function () {
         'Math.atan': 'arct',
         'Math.PI': 'PI',
         'Math.E': 'E'
+    };
+
+    Expression.OPTS = {
+        '=': ' = ',
+        '\\+': ' + ',
+        '-': ' - ',
+        '\\*': ' * ',
+        '/': ' / ',
+        '%': ' % '
     };
 
     Expression.VAR_X = 'x';
@@ -51,11 +61,12 @@ define([], function () {
 
     _prototype_.patterns = [{
         reg: Expression.DOMAIN_REG,
-        fn: function (group) {
+        fn: function (group, literal) {
             if (group && group.length === 3) {
                 var lower = new Function('return ' + group[1]);
                 var upper = new Function('return ' + group[2]);
                 this.literal.domain = [lower(), upper()];
+                this.expression.domain = this.format(literal);
                 return false;
             }
             return true;
@@ -65,6 +76,7 @@ define([], function () {
         fn: function (group, literal) {
             if (group && this.functional(literal, Expression.VAR_X)) {
                 this.literal = literal;
+                this.expression = this.format(literal);
                 return false;
             }
             return true;
@@ -74,6 +86,7 @@ define([], function () {
         fn: function (group, literal) {
             if (group && this.functional(literal, Expression.VAR_Q)) {
                 this.literal.y = literal;
+                this.expression.y = this.format(literal);
                 return false;
             }
             return true;
@@ -83,6 +96,7 @@ define([], function () {
         fn: function (group, literal) {
             if (group && this.functional(literal, Expression.VAR_Q)) {
                 this.literal.x = literal;
+                this.expression.x = this.format(literal);
                 return false;
             }
             return true;
@@ -118,6 +132,16 @@ define([], function () {
         for (var func in MATH_FUNC) {
             if (MATH_FUNC.hasOwnProperty(func)) {
                 literal = literal.replace(eval('/' + MATH_FUNC[func] + '/g'), func);
+            }
+        }
+        return literal;
+    };
+
+    _prototype_.format = function (literal) {
+        var OPTS = Expression.OPTS;
+        for (var opt in OPTS) {
+            if (OPTS.hasOwnProperty(opt)) {
+                literal = literal.replace(eval('/' + opt + '/g'), OPTS[opt]);
             }
         }
         return literal;
