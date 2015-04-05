@@ -13,6 +13,134 @@ define([
 ], function (Diagraph, Palette, Expression, parser) {
     'use strict';
 
+
+    function App() {
+        this.init();
+    }
+
+    var _prototype_ = App.prototype;
+
+
+    _prototype_.init = function () {
+        this.RATIO = 1.4142135623730951;
+        this.WHEEL_DAMP = 400;
+        this.ZOOM_LEVEL = 7;
+        this.CORNER_PADDING = 24;
+        this.CURSOR_ON = true;
+        this.DASHBOARD_ON = true;
+        this.EDITOR_ON = false;
+        this.DELTA_SUM = 0;
+        this.ON = 'on';
+        this.OFF = 'off';
+        this.STATE_ON = 'o';
+        this.STATE_OFF = 'x';
+        this.EXPRESSIONS = [
+            ['y=x', 'f00'],
+            ['y=x%2', '0f0'],
+            //['y=10*sin(x)/x', 'f0f'],
+            //['y=1/x', '393'],
+            ['x=4*(sin(2*q)+0.2*sin(100*q))*cos(q);y=4*(sin(2*q)+0.2*sin(100*q))*sin(q);q=[0,2*PI]', '00f']
+            //['x=4*cos(8*q)*cos(q);y=4*cos(8*q)*sin(q);q=[0,2*PI];', '0f0'],
+            //['x=4*cos(2*q)*cos(q);y=4*cos(2*q)*sin(q);q=[0,2*PI];', '0ff'],
+            //['x=q*cos(q);y=q*sin(q);q=[-1.5*PI,1.5*PI];', 'ff0'],
+            //['x=6*cos(q);y=3*sin(q);q=[0,2*PI];', 'f0f']
+        ];
+
+        this.refreshSize();
+
+        this.$window = $(window);
+        this.$body = $('body');
+        this.$canvas = $('#canvas');
+
+        this.$zoomLevel = $('#zoom-level');
+        this.$smoothBtn = $('#smooth-btn');
+        this.$cursorBtn = $('#cursor-btn');
+        this.$centeredBtn = $('#centered-btn');
+        this.$zoomInBtn = $('#zoom-in-btn');
+        this.$zoomOutBtn = $('#zoom-out-btn');
+        this.$dashboard = $('#dashboard');
+        this.$dashboardToggleBtn = $('#dashboard-toggle-btn');
+        this.$funcList = $('#func-list');
+        this.$editor = $('#func-editor');
+        this.$editorBg = $('#func-editor-bg');
+        this.$addFuncBtn = $('#add-func-btn');
+        this.$closeEditorBtn = $('#close-func-editor-btn');
+        this.$submitBtn = $('#submit-btn');
+
+        this.$drawingState = $('#drawing-state');
+        this.$cursorX = $('#cursor-x');
+        this.$cursorY = $('#cursor-y');
+
+        this.$lineX = $('#line-x');
+        this.$lineY = $('#line-y');
+
+        this.compiled = _.template($('#func-list-template').html());
+
+        this.drag = {client: [], origin: []};
+
+        this.diagraph = new Diagraph(this.$canvas, this.SIZE);
+        this.palette = new Palette($('#palette'));
+
+        return this;
+    };
+
+    _prototype_.initRouter = function () {
+        var self = this;
+        this.router = new Backbone.Router.extend({
+            routes: {
+                ':x/:y/:zoom/:smoothOn/:cursorOn/:dashboardOn/:exprCode': 'main',
+                '*otherwise': 'otherwise'
+            },
+            main: function (x, y, zoom, smoothOn, cursorOn, dashboardOn, exprCode) {
+
+                var origin = [Math.round(x), Math.round(y)];
+                var zoomLevel = Math.round(zoom);
+                var _zoom = parseZoom(zoomLevel);
+
+                self.ZOOM_LEVEL = zoomLevel;
+                self.diagraph.SMOOTH = smoothOn === STATE_ON;
+                self.CURSOR_ON = cursorOn === STATE_ON;
+                self.DASHBOARD_ON = dashboardOn === STATE_ON;
+                self.EXPRESSIONS = parser.decompress(exprCode);
+
+                refreshSmoothBtn(self.diagraph.SMOOTH);
+                refreshCursorBtn(self.CURSOR_ON);
+                refreshDashboard(self.DASHBOARD_ON);
+                refreshEditor(self.EDITOR_ON);
+                refreshZoomLevel(self.ZOOM_LEVEL);
+
+                diagraph.zoom(_zoom);
+                diagraph.origin(parseOrigin(origin));
+
+                refreshState();
+
+                EXPRESSIONS.forEach(function (expr) {
+                    var expression = new Expression(expr[0], expr[1]);
+                    diagraph.pushExpression(expression);
+                });
+
+                var funcLis = $(compiled({list: diagraph.expressions}));
+                $('.edit-btn', funcLis).on('click', onEditFunc);
+                $funcList.html(funcLis);
+
+                diagraph.redraw(SIZE);
+            },
+            otherwise: function () {
+                refreshState(null, true);
+            }
+        })();
+
+    };
+
+    _prototype_.refreshSize = function () {
+        this.SIZE = [this.$body.width(), this.$body.height()];
+        return this;
+    };
+
+
+// ==================================
+
+
     var RATIO = 1.4142135623730951;
     var WHEEL_DAMP = 400;
     var ZOOM_LEVEL = 7;
@@ -24,10 +152,11 @@ define([
     var ON = 'on', OFF = 'off';
     var STATE_ON = 'o', STATE_OFF = 'x';
     var EXPRESSIONS = [
-        //['y=x', 'f00'],
+        ['y=x', 'f00'],
+        ['y=x%2', '0f0'],
         //['y=10*sin(x)/x', 'f0f'],
-        ['y=1/x', '393']
-        //['x=4*(sin(2*q)+0.2*sin(100*q))*cos(q);y=4*(sin(2*q)+0.2*sin(100*q))*sin(q);q=[0,2*PI]', 'f00'],
+        //['y=1/x', '393'],
+        ['x=4*(sin(2*q)+0.2*sin(100*q))*cos(q);y=4*(sin(2*q)+0.2*sin(100*q))*sin(q);q=[0,2*PI]', '00f']
         //['x=4*cos(8*q)*cos(q);y=4*cos(8*q)*sin(q);q=[0,2*PI];', '0f0'],
         //['x=4*cos(2*q)*cos(q);y=4*cos(2*q)*sin(q);q=[0,2*PI];', '0ff'],
         //['x=q*cos(q);y=q*sin(q);q=[-1.5*PI,1.5*PI];', 'ff0'],
@@ -53,8 +182,7 @@ define([
         $editorBg = $('#func-editor-bg'),
         $addFuncBtn = $('#add-func-btn'),
         $closeEditorBtn = $('#close-func-editor-btn'),
-        $editBtns = $('.edit-btn'),
-        $deleteBtns = $('.delete-btn'),
+        $submitBtn = $('#submit-btn'),
 
         $drawingState = $('#drawing-state'),
         $cursorX = $('#cursor-x'),
@@ -88,6 +216,7 @@ define([
             '*otherwise': 'otherwise'
         },
         main: function (x, y, zoom, smoothOn, cursorOn, dashboardOn, exprCode) {
+
             var origin = [Math.round(x), Math.round(y)];
             var zoomLevel = Math.round(zoom);
             var _zoom = parseZoom(zoomLevel);
@@ -114,7 +243,9 @@ define([
                 diagraph.pushExpression(expression);
             });
 
-            $funcList.html(compiled({list: diagraph.expressions}));
+            var funcLis = $(compiled({list: diagraph.expressions}));
+            $('.edit-btn', funcLis).on('click', onEditFunc);
+            $funcList.html(funcLis);
 
             diagraph.redraw(SIZE);
         },
@@ -210,15 +341,7 @@ define([
         if (!EDITOR_ON) {
             EDITOR_ON = true;
             $editor.addClass('animate');
-            refreshEditor(EDITOR_ON);
-        }
-    });
-
-    $editBtns.on('click', function (event) {
-        event.stopPropagation();
-        if (!EDITOR_ON) {
-            EDITOR_ON = true;
-            $editor.addClass('animate');
+            palette.setSelectedRandom();
             refreshEditor(EDITOR_ON);
         }
     });
@@ -339,6 +462,15 @@ define([
                 ZOOM_LEVEL += _delta;
                 refreshDiagraphZoom(_delta);
             }
+        }
+    }
+
+    function onEditFunc(event) {
+        event.stopPropagation();
+        if (!EDITOR_ON) {
+            EDITOR_ON = true;
+            $editor.addClass('animate');
+            refreshEditor(EDITOR_ON);
         }
     }
 

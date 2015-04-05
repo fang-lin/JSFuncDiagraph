@@ -391,7 +391,7 @@ button {
 #func-editor-wrap {
   position: relative;
   margin: 0 auto;
-  width: 372px;
+  width: 340px;
 }
 
 #func-editor {
@@ -400,11 +400,11 @@ button {
   background: #eeeeee;
   margin: 0 auto;
   z-index: 20;
-  width: 372px;
   cursor: default;
   visibility: hidden;
   top: -9999px;
   left: 0;
+  right: 0;
   border-style: solid;
   border-color: #666666;
   border-width: 0 1px 1px 1px;
@@ -418,7 +418,6 @@ button {
   }
   &.on {
     top: 0;
-    right: 0;
     #dashboard-toggle button {
       .sprite-position(@corner-off);
       &:hover {
@@ -455,7 +454,7 @@ button {
     }
   }
   #func-textarea-wrap {
-    padding: 10px 20px;
+    padding: 10px 32px 10px 20px;
     textarea {
       outline: medium none;
       border: solid 1px #999999;
@@ -463,7 +462,7 @@ button {
       font-size: 12px;
       line-height: 16px;
       display: block;
-      width: 320px;
+      width: 100%;
       height: 96px;
       resize: none;
     }
@@ -475,11 +474,11 @@ button {
     padding: 0 20px 20px 20px;
     #palette {
       float: left;
-      width: 288px;
+      width: 252px;
       a {
         float: left;
-        width: 6px;
-        height: 6px;
+        width: 5px;
+        height: 5px;
         cursor: pointer;
         border-width: 1px;
         border-style: solid;
@@ -498,6 +497,13 @@ button {
     }
     #submit-btn {
       float: right;
+      width: 28px;
+      height: 28px;
+      margin-top: 7px;
+      .sprite-position(@ok);
+      &:hover {
+        .sprite-position(@ok-hover);
+      }
     }
     &:after {
       .clear();

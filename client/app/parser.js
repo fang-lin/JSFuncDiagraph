@@ -23,7 +23,6 @@ define([
     };
 
     parser.decompress = function (base64Code) {
-
         var str = LZString.decompressFromBase64(base64Code);
 
         return str.split(SEPARATOR[0]).map(function (expression) {

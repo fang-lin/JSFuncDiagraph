@@ -3,7 +3,9 @@
  * Author: isaac.fang@grapecity.com
  */
 
-define([], function () {
+define([
+    'underscore'
+], function (_) {
     'use strict';
 
     function Palette($ele) {
@@ -22,7 +24,7 @@ define([], function () {
                 for (var b = 0; b < 16; b += 3) {
                     colors.push({
                         rgb: r.toString(16) + g.toString(16) + b.toString(16),
-                        bright: (r > 6 && g > 6 && b > 6)
+                        bright: (r + g + b > 21)
                     });
                 }
             }
@@ -43,15 +45,31 @@ define([], function () {
 
     _prototype_.onSelect = function () {
         var self = this;
-        this.$ele.children('a').on('click', function (event) {
-            var $a = $(this);
-            if (self.$selected) {
-                self.$selected.removeClass('selected');
-            }
-            self.$selected = $a;
-            self.selectedColor = $a.attr('value');
-            $a.addClass('selected');
+        this.$ele.children('a').on('click', function () {
+            self.setSelected($(this));
         });
+        return this;
+    };
+
+    _prototype_.setSelected = function ($a) {
+        if (self.$selected) {
+            self.$selected.removeClass('selected');
+        }
+        self.$selected = $a;
+        self.selectedColor = $a.attr('value');
+        $a.addClass('selected');
+        return this;
+    };
+
+    _prototype_.getRandomColor = function () {
+        var max = this.colors.length - 1;
+        return this.colors[_.random(0, max)];
+    };
+
+    _prototype_.setSelectedRandom = function () {
+        var max = this.colors.length - 1;
+        var $a = this.$ele.children('a').eq(_.random(0, max));
+        this.setSelected($a);
         return this;
     };
 

@@ -10,6 +10,12 @@ define([
     'use strict';
 
     function Diagraph($wrap, size) {
+        this.ZOOM_RANGE = [2, 500];
+        this.AXIS_COLOR = '#666';
+        this.GRID_COLOR = '#eee';
+        this.SMOOTH = true;
+        this.CW_ON = true;
+
         this.$wrap = $wrap;
         this.expressions = [];
 
@@ -35,11 +41,11 @@ define([
     Diagraph.CHORD_FIELD = [0.9, 1.1];
     Diagraph.MAX_ITERATION = 4294967296;
     Diagraph.MAX_DELTA_RECOUNT = 8;
-    Diagraph.ZOOM_RANGE = [2, 500];
-    Diagraph.AXIS_COLOR = '#666';
-    Diagraph.GRID_COLOR = '#eee';
-    Diagraph.SMOOTH = true;
-    Diagraph.CW_ON = true;
+    //Diagraph.ZOOM_RANGE = [2, 500];
+    //Diagraph.AXIS_COLOR = '#666';
+    //Diagraph.GRID_COLOR = '#eee';
+    //Diagraph.SMOOTH = true;
+    //Diagraph.CW_ON = true;
 
     var _prototype_ = Diagraph.prototype;
 
@@ -83,7 +89,7 @@ define([
         context.lineTo(size[0] + 0.5, origin[1]);
         context.moveTo(origin[0] + 0.5, 0);
         context.lineTo(origin[0] + 0.5, size[1]);
-        context.strokeStyle = Diagraph.AXIS_COLOR;
+        context.strokeStyle = this.AXIS_COLOR;
         context.stroke();
         return this;
     };
@@ -107,7 +113,7 @@ define([
             context.moveTo(0.5, y);
             context.lineTo(size[0] + 0.5, y);
         }
-        context.strokeStyle = Diagraph.GRID_COLOR;
+        context.strokeStyle = this.GRID_COLOR;
         context.stroke();
         return this;
     };
@@ -127,7 +133,7 @@ define([
 
     _prototype_.zoom = function (zoom) {
         if (zoom) {
-            var ZOOM_RANGE = Diagraph.ZOOM_RANGE;
+            var ZOOM_RANGE = this.ZOOM_RANGE;
             if (zoom >= ZOOM_RANGE[0] && zoom <= ZOOM_RANGE[1]) {
                 this._zoom = zoom;
             }
@@ -341,7 +347,7 @@ define([
         var funcType = (expression.literal.domain ? 'parametric' : 'equation') + 'ToCoords';
         var arg = this.cwArg(expression);
         var promise;
-        if (Diagraph.CW_ON) {
+        if (this.CW_ON) {
             promise = this._drawingWorker[funcType](arg);
             promise.then(function (result) {
                 self.drawWithCoords(expression, result);
