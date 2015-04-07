@@ -53,7 +53,6 @@ define([], function () {
         var func;
         try {
             func = new Function(varName, 'return ' + literal + ';');
-            console.log(func);
         } catch (err) {
             console.error(err);
             func = null;
@@ -76,9 +75,11 @@ define([], function () {
     }, {
         reg: Expression.Y_X_REG,
         fn: function (group, literal) {
-            if (group && this.functional(literal, Expression.VAR_X)) {
+            var fn = this.functional(literal, Expression.VAR_X);
+            if (group && fn) {
                 this.literal = literal;
                 this.expression = this.format(literal);
+                this.func = fn;
                 return false;
             }
             return true;
@@ -86,9 +87,11 @@ define([], function () {
     }, {
         reg: Expression.Y_Q_REG,
         fn: function (group, literal) {
-            if (group && this.functional(literal, Expression.VAR_Q)) {
+            var fn = this.functional(literal, Expression.VAR_Q);
+            if (group && fn) {
                 this.literal.y = literal;
                 this.expression.y = this.format(literal);
+                this.func = fn;
                 return false;
             }
             return true;
@@ -123,6 +126,10 @@ define([], function () {
                 i++;
             } while (keep && i < patterns.length);
         });
+
+        if (typeof this.literal === 'object' && !this.literal.domain) {
+            this.error = true;
+        }
     };
 
     _prototype_.trim = function (literal) {
@@ -141,9 +148,15 @@ define([], function () {
 
     _prototype_.format = function (literal) {
         var OPTS = Expression.OPTS;
+        var MATH_FUNC = Expression.MATH_FUNC;
         for (var opt in OPTS) {
             if (OPTS.hasOwnProperty(opt)) {
                 literal = literal.replace(eval('/' + opt + '/g'), OPTS[opt]);
+            }
+        }
+        for (var func in MATH_FUNC) {
+            if (MATH_FUNC.hasOwnProperty(func)) {
+                literal = literal.replace(eval('/' + func + '/g'), MATH_FUNC[func]);
             }
         }
         return literal;

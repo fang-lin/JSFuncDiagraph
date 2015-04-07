@@ -65,7 +65,7 @@ define([
         this.$closeEditorBtn = $('#close-func-editor-btn');
         this.$submitBtn = $('#submit-btn');
 
-        //this.$drawingState = $('#drawing-state');
+        this.$drawingState = $('#drawing-state');
         this.$cursorX = $('#cursor-x');
         this.$cursorY = $('#cursor-y');
 
@@ -103,8 +103,6 @@ define([
                 self.EXPRESSIONS = parser.decode(exprsEncode);
 
                 self.diagraph.batchExpressions(self.EXPRESSIONS);
-
-                console.log(self.diagraph.SMOOTH);
 
                 self.refreshSmoothBtn(self.diagraph.SMOOTH);
                 self.refreshCursorBtn(self.CURSOR_ON);
@@ -148,6 +146,12 @@ define([
 
     _prototype_.onEvents = function () {
         var self = this;
+
+        this.diagraph.on('drawingStart', function () {
+            self.$drawingState.html('drawing...');
+        }).on('drawingComplete', function () {
+            self.$drawingState.html('');
+        });
 
         $('#bl-panel button, #br-panel button, #dashboard, #func-editor, #func-editor-bg')
             .on('mousedown', function (event) {
@@ -255,17 +259,26 @@ define([
 
         this.$submitBtn.on('click', function (event) {
 
-            var exp = new Expression(self.$funcTextarea.val(), self.palette.selectedColor);
-            console.log(exp);
-            //if (exp) {
-            //
-            //}
-            //
-            //if (self.editingFuncIndex == null) {
-            //    // new add
-            //} else {
-            //    // edit
-            //}
+            var expr = new Expression(self.$funcTextarea.val(), self.palette.selectedColor);
+
+
+            if (self.editingFuncIndex == null) {
+                // new add
+
+                if (expr.error) {
+
+                } else {
+                    self.diagraph.pushExpression(expr);
+                    self.EXPRESSIONS = self.diagraph.getExpressionsArray();
+                    self.refreshState({exprsEncode: parser.encode(self.EXPRESSIONS)});
+                    self.refreshFuncList();
+                    self.refreshDashboard(self.DASHBOARD_ON);
+                    self.diagraph.redraw(self.SIZE);
+                }
+
+            } else {
+                // edit
+            }
         });
 
         return this;

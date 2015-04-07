@@ -143,22 +143,36 @@ define([
     _prototype_.getExpressionsArray = function () {
         return this.expressions.map(function (expr) {
             var literal;
-            if (expr.literal.domain) {
-                literal = expr.literal.x + ';' + expr.literal.y + ';' + expr.literal.domain;
+            if (expr.expression.domain) {
+                literal = expr.expression.x + ';' + expr.expression.y + ';' + expr.expression.domain;
             } else {
-                literal = expr.literal;
+                literal = expr.expression;
             }
             return [literal, expr.rgb];
         });
     };
 
+    _prototype_.emptyExpressions = function () {
+        this.expressions.map(function (expr) {
+            expr.$canvas.remove();
+        });
+        this.expressions = [];
+        return this;
+    };
+
+
     _prototype_.deleteExpression = function (index) {
-        return this.expressions.splice(index, 1);
+        var deleted = this.expressions.splice(index, 1)[0];
+        if (deleted) {
+            deleted.$canvas.remove();
+            return deleted;
+        }
+        return null;
     };
 
     _prototype_.batchExpressions = function (expressions) {
         var self = this;
-        this.expressions = [];
+        this.emptyExpressions();
         expressions.forEach(function (expr) {
             self.pushExpression(new Expression(expr[0], expr[1]));
         });
@@ -169,6 +183,7 @@ define([
         if (expression.literal && expression.color) {
             var $canvas = this.createLayer('expression');
             this.$wrap.append($canvas);
+            expression.$canvas = $canvas;
             expression.canvas = $canvas[0].getContext('2d');
 
             this.expressions.push(expression);
@@ -349,7 +364,7 @@ define([
             MAX_ITERATION: Diagraph.MAX_ITERATION,
             MAX_DELTA_RECOUNT: Diagraph.MAX_DELTA_RECOUNT,
             MIN_DELTA: Diagraph.MIN_DELTA,
-            SMOOTH: Diagraph.SMOOTH,
+            SMOOTH: this.SMOOTH,
             VAR_X: Expression.VAR_X,
             VAR_Q: Expression.VAR_Q
         };
@@ -417,6 +432,7 @@ define([
 
     _prototype_.on = function (type, cb) {
         this._events[type] = cb;
+        return this;
     };
 
     _prototype_.trigger = function (type) {
@@ -424,6 +440,7 @@ define([
         if (cb) {
             cb(type);
         }
+        return this;
     };
 
     return Diagraph;
