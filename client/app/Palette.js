@@ -10,6 +10,7 @@ define([
 
     function Palette($ele) {
         this.$ele = $ele;
+        this.map = {};
         this.initColors()
             .appendDom()
             .onSelect();
@@ -35,10 +36,14 @@ define([
 
     _prototype_.appendDom = function () {
         var $ele = this.$ele;
+        var map = this.map;
         this.colors.forEach(function (color) {
             var isBright = color.bright ? 'bright' : '';
             var rgb = color.rgb;
-            $ele.append('<a style="background-color: #' + rgb + ';border-color: #' + rgb + ';" value="' + rgb + '" class="' + isBright + '" title="#' + rgb + '"/>');
+            var $a = $('<a style="background-color: #' + rgb + ';border-color: #' + rgb + ';" value="' + rgb + '" class="' + isBright + '" title="#' + rgb + '"/>');
+            color.$a = $a;
+            map[rgb] = color;
+            $ele.append($a);
         });
         return this;
     };
@@ -52,11 +57,11 @@ define([
     };
 
     _prototype_.setSelected = function ($a) {
-        if (self.$selected) {
-            self.$selected.removeClass('selected');
+        if (this.$selected) {
+            this.$selected.removeClass('selected');
         }
-        self.$selected = $a;
-        self.selectedColor = $a.attr('value');
+        this.$selected = $a;
+        this.selectedColor = $a.attr('value');
         $a.addClass('selected');
         return this;
     };

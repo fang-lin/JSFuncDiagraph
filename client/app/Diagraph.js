@@ -41,11 +41,6 @@ define([
     Diagraph.CHORD_FIELD = [0.9, 1.1];
     Diagraph.MAX_ITERATION = 4294967296;
     Diagraph.MAX_DELTA_RECOUNT = 8;
-    //Diagraph.ZOOM_RANGE = [2, 500];
-    //Diagraph.AXIS_COLOR = '#666';
-    //Diagraph.GRID_COLOR = '#eee';
-    //Diagraph.SMOOTH = true;
-    //Diagraph.CW_ON = true;
 
     var _prototype_ = Diagraph.prototype;
 
@@ -91,6 +86,7 @@ define([
         context.lineTo(origin[0] + 0.5, size[1]);
         context.strokeStyle = this.AXIS_COLOR;
         context.stroke();
+
         return this;
     };
 
@@ -115,6 +111,7 @@ define([
         }
         context.strokeStyle = this.GRID_COLOR;
         context.stroke();
+
         return this;
     };
 
@@ -141,6 +138,31 @@ define([
         } else {
             return this._zoom;
         }
+    };
+
+    _prototype_.getExpressionsArray = function () {
+        return this.expressions.map(function (expr) {
+            var literal;
+            if (expr.literal.domain) {
+                literal = expr.literal.x + ';' + expr.literal.y + ';' + expr.literal.domain;
+            } else {
+                literal = expr.literal;
+            }
+            return [literal, expr.rgb];
+        });
+    };
+
+    _prototype_.deleteExpression = function (index) {
+        return this.expressions.splice(index, 1);
+    };
+
+    _prototype_.batchExpressions = function (expressions) {
+        var self = this;
+        this.expressions = [];
+        expressions.forEach(function (expr) {
+            self.pushExpression(new Expression(expr[0], expr[1]));
+        });
+        return this;
     };
 
     _prototype_.pushExpression = function (expression) {

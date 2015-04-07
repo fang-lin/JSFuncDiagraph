@@ -7,7 +7,8 @@ define([], function () {
     'use strict';
 
     function Expression(literal, color) {
-        this.color = '#' + (color || '#333').replace(/#/g, '');
+        this.rgb = (color || '#333').replace(/#/g, '');
+        this.color = '#' + this.rgb;
         this.literal = {};
         this.expression = {};
         this.split(this.calibrate(this.trim(literal)));
@@ -52,6 +53,7 @@ define([], function () {
         var func;
         try {
             func = new Function(varName, 'return ' + literal + ';');
+            console.log(func);
         } catch (err) {
             console.error(err);
             func = null;

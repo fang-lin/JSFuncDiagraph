@@ -13,21 +13,27 @@ define([
 
     var parser = {};
 
-    parser.compress = function (expressions) {
+    parser.encode = function (expressions) {
+        var str = '';
 
-        var str = expressions.map(function (expression) {
-            return expression.join(SEPARATOR[1]);
-        }).join(SEPARATOR[0]);
+        if (expressions && expressions.length) {
+            str = expressions.map(function (expression) {
+                return expression.join(SEPARATOR[1]);
+            }).join(SEPARATOR[0]);
+        }
 
         return LZString.compressToBase64(str);
     };
 
-    parser.decompress = function (base64Code) {
+    parser.decode = function (base64Code) {
         var str = LZString.decompressFromBase64(base64Code);
-
-        return str.split(SEPARATOR[0]).map(function (expression) {
-            return expression.split(SEPARATOR[1]);
-        });
+        if (str) {
+            return str.split(SEPARATOR[0]).map(function (expression) {
+                return expression.split(SEPARATOR[1]);
+            });
+        } else {
+            return [];
+        }
     };
 
     return parser;

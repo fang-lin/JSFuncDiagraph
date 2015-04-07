@@ -20,7 +20,7 @@ var gulp = require('gulp'),
     sh = require('shelljs'),
     path = require('path'),
     gulpIf = require('gulp-if'),
-    sprite = require('css-sprite').stream,
+    //sprite = require('css-sprite').stream,
     Q = require('q'),
     _ = require('underscore'),
     fs = require('fs'),
@@ -82,16 +82,16 @@ gulp.task('bower', ['clean'], function (done) {
 
 // endregion bower
 
-gulp.task('sprites', function () {
-    return gulp.src('./client/img/slice/*.png')
-        .pipe(sprite({
-            name: 'buttons',
-            style: 'buttons.less',
-            cssPath: '../img/',
-            processor: 'less'
-        }))
-        .pipe(gulpIf('*.png', gulp.dest('./client/img/'), gulp.dest('./client/css/')))
-});
+//gulp.task('sprites', function () {
+//    return gulp.src('./client/img/slice/*.png')
+//        .pipe(sprite({
+//            name: 'buttons',
+//            style: 'buttons.less',
+//            cssPath: '../img/',
+//            processor: 'less'
+//        }))
+//        .pipe(gulpIf('*.png', gulp.dest('./client/img/'), gulp.dest('./client/css/')))
+//});
 
 // region minify-css
 

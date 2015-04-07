@@ -127,7 +127,7 @@
 <script type="text/javascript" data-main="init" src="lib/requirejs/require.js"></script>
 </body>
 <script type="text/template" id="func-list-template">
-    <% list.forEach(function(expr){ %>
+    <% list.forEach(function(expr, index){ %>
     <li>
         <div class="col1" style="background: <%= expr.color %>">
             <button class="show-on-btn"></button>
@@ -144,8 +144,8 @@
             <% } %>
         </div>
         <div class="col3">
-            <button class="delete-btn" title="Delete">Delete</button>
-            <button class="edit-btn" title="Edit">Edit</button>
+            <button class="delete-btn" title="Delete" data-index="<%= index %>">Delete</button>
+            <button class="edit-btn" title="Edit" data-index="<%= index %>">Edit</button>
         </div>
     </li>
     <% }) %>
