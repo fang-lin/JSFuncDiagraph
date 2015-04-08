@@ -34,18 +34,19 @@ define([
         this.initDrawingWorker(8);
 
         this._events = {};
+        this._drawCount = 0;
     }
 
     Diagraph.MIN_DELTA = 1e-7;
     Diagraph.MAX_VALUE = 1e100;
     Diagraph.CHORD_FIELD = [0.9, 1.1];
     Diagraph.MAX_ITERATION = 4294967296;
-    Diagraph.MAX_DELTA_RECOUNT = 8;
+    Diagraph.MAX_DELTA_RECOUNT = 16;
 
     var _prototype_ = Diagraph.prototype;
 
     _prototype_.createLayer = function (className) {
-        return $('<canvas class="' + className + '"/>');
+        return $('<canvas class="' + className + '"/>').attr('width', this.$wrap.width()).attr('height', this.$wrap.height());
     };
 
     _prototype_.range = function (origin, zoom) {
@@ -140,6 +141,15 @@ define([
         }
     };
 
+    _prototype_.drawCount = function (delta) {
+        this._drawCount += delta;
+        if (this._drawCount > 0) {
+            this.trigger('drawing');
+        } else {
+            this.trigger('completed');
+        }
+    };
+
     _prototype_.getExpressionsArray = function () {
         return this.expressions.map(function (expr) {
             var literal;
@@ -217,42 +227,80 @@ define([
             y = func(x),
             dx = MAX_DELTA;
 
-        var iterationCount = 0;
+        var iterationCount = 0,
+            overflow = false,
+            tx;
 
-        do {
-            if (isNaN(y) || Math.abs(y) >= MAX_VALUE) {
-                dx = MAX_DELTA;
-            } else {
-                var deltaRecount = 0;
-                do {
-                    var dy = y - func(x + dx);
-                    var chord = Math.pow(Math.pow(dx, 2) + Math.pow(dy, 2), 0.5);
+        function computeDx() {
+            var deltaRecount = 0,
+                lower = 0,
+                upper = null,
+                k = dx > 0 ? 1 : -1;
+            do {
+                var dy = y - func(x + dx);
+                var chord = Math.pow(Math.pow(dx, 2) + Math.pow(dy, 2), 0.5);
 
-                    if (chord * zoom > CHORD_FIELD[0] && chord * zoom < CHORD_FIELD[1]) {
-                        break;
+                if (chord * zoom < CHORD_FIELD[0]) {
+                    lower = dx;
+                    if (upper == null) {
+                        dx *= 2;
                     } else {
-                        dx = Math.cos(Math.atan(dy / dx)) / zoom;
+                        dx += (upper - lower) / 2;
                     }
+                } else if (chord * zoom > CHORD_FIELD[1]) {
+                    upper = dx;
+                    dx -= (upper - lower) / 2;
+                } else {
+                    break;
+                }
 
-                    if (dx < MIN_DELTA) {
-                        dx = MIN_DELTA;
-                        break;
-                    }
+                if (Math.abs(dx) < MIN_DELTA) {
+                    dx = k * MIN_DELTA;
+                    break;
+                }
 
-                } while (deltaRecount++ < MAX_DELTA_RECOUNT);
-            }
+            } while (deltaRecount++ < MAX_DELTA_RECOUNT);
 
             if (isNaN(dx)) {
-                dx = MIN_DELTA;
+                dx = k * MIN_DELTA;
             }
+        }
 
-            x += dx;
-            y = func(x);
+        do {
 
-            if (y > range[3] && y < range[1]) {
+            if (isNaN(y) || Math.abs(y) >= MAX_VALUE || y < range[3] || y > range[1]) {
+
+                if (!overflow && dx < 0) {
+                    // draw to negative direction
+                    x = tx;
+                    dx = MAX_DELTA;
+                    computeDx();
+                    overflow = false;
+                } else {
+                    dx = MAX_DELTA;
+                    overflow = true;
+                }
+
+                x += dx;
+                y = func(x);
+
+            } else {
+
+                if (overflow) {
+                    // enter range first, reverse dx
+                    dx = -MAX_DELTA;
+                    tx = x;
+                }
+                overflow = false;
+
+                computeDx();
+
                 px = offset[0] + x * zoom;
                 py = offset[1] - y * zoom;
                 coords.push(SMOOTH ? [px, py] : [Math.round(px), Math.round(py)]);
+
+                x += dx;
+                y = func(x);
             }
 
         } while (x < range[2] && iterationCount++ < MAX_ITERATION);
@@ -299,16 +347,28 @@ define([
             if (isNaN(x) || Math.abs(x) >= MAX_VALUE || isNaN(y) || Math.abs(y) >= MAX_VALUE) {
                 dq = MAX_DELTA;
             } else {
-                var deltaRecount = 0;
+                var deltaRecount = 0,
+                    lower = 0,
+                    upper = null;
+
                 do {
-                    var dx = x - funcX(q + dq);
-                    var dy = y - funcY(q + dq);
+                    var dx = x - funcX(q + dq),
+                        dy = y - funcY(q + dq);
+
                     var chord = Math.pow(Math.pow(dx, 2) + Math.pow(dy, 2), 0.5);
 
-                    if (chord * zoom > CHORD_FIELD[0] && chord * zoom < CHORD_FIELD[1]) {
-                        break;
+                    if (chord * zoom < CHORD_FIELD[0]) {
+                        lower = dq;
+                        if (upper == null) {
+                            dq *= 2;
+                        } else {
+                            dq += (upper - lower) / 2;
+                        }
+                    } else if (chord * zoom > CHORD_FIELD[1]) {
+                        upper = dq;
+                        dq -= (upper - lower) / 2;
                     } else {
-                        dq = dq / chord / zoom;
+                        break;
                     }
 
                     if (dq < MIN_DELTA) {
@@ -327,7 +387,7 @@ define([
             x = funcX(q);
             y = funcY(q);
 
-            if (y > range[3] && y < range[1]) {
+            if (x > range[0] && x < range[2] && y > range[3] && y < range[1]) {
                 px = offset[0] + x * zoom;
                 py = offset[1] - y * zoom;
                 coords.push(SMOOTH ? [px, py] : [Math.round(px), Math.round(py)]);
@@ -383,30 +443,25 @@ define([
         var self = this;
         var funcType = (expression.literal.domain ? 'parametric' : 'equation') + 'ToCoords';
         var arg = this.cwArg(expression);
-        var promise;
         if (this.CW_ON) {
-            promise = this._drawingWorker[funcType](arg);
-            promise.then(function (result) {
+            this.drawCount(1);
+            this._drawingWorker[funcType](arg).then(function (result) {
                 self.drawWithCoords(expression, result);
+                self.trigger('drawingComplete');
+                self.drawCount(-1);
             });
         } else {
-            promise = this.drawWithCoords(expression, this[funcType](arg));
+            this.drawWithCoords(expression, this[funcType](arg));
         }
 
-        return promise;
+        return this;
     };
 
     _prototype_.drawExpressions = function () {
         var self = this;
         this._drawingWorker.clearQueue();
-        this.trigger('drawingStart');
-
-        cw.all(this.expressions.map(function (expression) {
+        this.expressions.forEach(function (expression) {
             return self.drawExpression(expression);
-        }).filter(function (promise) {
-            return promise;
-        })).then(function () {
-            self.trigger('drawingComplete');
         });
     };
 

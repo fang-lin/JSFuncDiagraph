@@ -32,7 +32,6 @@ define([
         this.OFF = 'off';
         this.STATE_ON = '+';
         this.STATE_OFF = '-';
-        this.EXPRESSIONS = [];
         this.EXPRESSIONS = [
             ['y=x'],
             ['y=x%2', '0f0'],
@@ -44,6 +43,7 @@ define([
             //['x=q*cos(q);y=q*sin(q);q=[-1.5*PI,1.5*PI];', 'ff0'],
             //['x=6*cos(q);y=3*sin(q);q=[0,2*PI];', 'f0f']
         ];
+        this.EXPRESSIONS = [];
 
         this.$window = $(window);
         this.$body = $('body');
@@ -147,9 +147,9 @@ define([
     _prototype_.onEvents = function () {
         var self = this;
 
-        this.diagraph.on('drawingStart', function () {
+        this.diagraph.on('drawing', function () {
             self.$drawingState.html('drawing...');
-        }).on('drawingComplete', function () {
+        }).on('completed', function () {
             self.$drawingState.html('');
         });
 
@@ -261,23 +261,23 @@ define([
 
             var expr = new Expression(self.$funcTextarea.val(), self.palette.selectedColor);
 
-
             if (self.editingFuncIndex == null) {
                 // new add
 
                 if (expr.error) {
-
+                    console.log('error');
                 } else {
                     self.diagraph.pushExpression(expr);
                     self.EXPRESSIONS = self.diagraph.getExpressionsArray();
                     self.refreshState({exprsEncode: parser.encode(self.EXPRESSIONS)});
                     self.refreshFuncList();
                     self.refreshDashboard(self.DASHBOARD_ON);
-                    self.diagraph.redraw(self.SIZE);
+                    self.diagraph.drawExpression(expr);
                 }
 
             } else {
                 // edit
+                console.log('edit');
             }
         });
 
@@ -425,7 +425,6 @@ define([
             this.refreshState({exprsEncode: parser.encode(this.EXPRESSIONS)});
             this.refreshFuncList();
             this.refreshDashboard(this.DASHBOARD_ON);
-            this.diagraph.redraw();
         }
     };
 
