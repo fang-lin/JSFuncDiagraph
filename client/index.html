@@ -127,20 +127,22 @@
 <script type="text/javascript" data-main="init" src="lib/requirejs/require.js"></script>
 </body>
 <script type="text/template" id="func-list-template">
-    <% list.forEach(function(expr, index){ %>
+    <% list.forEach(function(exp, index){ %>
     <li>
-        <div class="col1" style="background: <%= expr.color %>">
-            <button class="show-on-btn"></button>
+        <div class="col1" style="background: <%= exp.color %>">
+            <button class="show-on-btn<%= exp.hide ? ' hide' : '' %>" title="Show/Hide" data-index="<%= index %>">
+                Show/Hide
+            </button>
         </div>
         <div class="col2">
-            <% if(expr.expression.domain){ %>
-            <p><%= expr.expression.x %>;</p>
+            <% if (exp.expression.domain) { %>
+            <p><%= exp.expression.x %>;</p>
 
-            <p><%= expr.expression.y %>;</p>
+            <p><%= exp.expression.y %>;</p>
 
-            <p><%= expr.expression.domain %>;</p>
-            <% }else{ %>
-            <p><%= expr.expression %>;</p>
+            <p><%= exp.expression.domain %>;</p>
+            <% } else { %>
+            <p><%= exp.expression %>;</p>
             <% } %>
         </div>
         <div class="col3">
@@ -148,6 +150,6 @@
             <button class="edit-btn" title="Edit" data-index="<%= index %>">Edit</button>
         </div>
     </li>
-    <% }) %>
+    <% }); %>
 </script>
 </html>

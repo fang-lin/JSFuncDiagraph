@@ -289,6 +289,12 @@ button {
           &:hover {
             .sprite-position(@eye-hover);
           }
+          &.hide {
+            .sprite-position(@eye-off);
+            &:hover {
+              .sprite-position(@eye-off-hover);
+            }
+          }
         }
       }
       .col2 {

@@ -6,9 +6,10 @@
 define([], function () {
     'use strict';
 
-    function Expression(literal, color) {
+    function Expression(literal, color, hide) {
         this.rgb = (color || '#333').replace(/#/g, '');
         this.color = '#' + this.rgb;
+        this.hide = !!hide;
         this.literal = {};
         this.expression = {};
         this.split(this.calibrate(this.trim(literal)));

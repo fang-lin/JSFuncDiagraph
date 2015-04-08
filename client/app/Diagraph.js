@@ -151,14 +151,14 @@ define([
     };
 
     _prototype_.getExpressionsArray = function () {
-        return this.expressions.map(function (expr) {
+        return this.expressions.map(function (exp) {
             var literal;
-            if (expr.expression.domain) {
-                literal = expr.expression.x + ';' + expr.expression.y + ';' + expr.expression.domain;
+            if (exp.expression.domain) {
+                literal = exp.expression.x + ';' + exp.expression.y + ';' + exp.expression.domain;
             } else {
-                literal = expr.expression;
+                literal = exp.expression;
             }
-            return [literal, expr.rgb];
+            return [literal, exp.rgb, exp.hide ? 1 : 0];
         });
     };
 
@@ -184,7 +184,7 @@ define([
         var self = this;
         this.emptyExpressions();
         expressions.forEach(function (expr) {
-            self.pushExpression(new Expression(expr[0], expr[1]));
+            self.pushExpression(new Expression(expr[0], expr[1], expr[2]));
         });
         return this;
     };
@@ -440,20 +440,23 @@ define([
     };
 
     _prototype_.drawExpression = function (expression) {
-        var self = this;
-        var funcType = (expression.literal.domain ? 'parametric' : 'equation') + 'ToCoords';
-        var arg = this.cwArg(expression);
-        if (this.CW_ON) {
-            this.drawCount(1);
-            this._drawingWorker[funcType](arg).then(function (result) {
-                self.drawWithCoords(expression, result);
-                self.trigger('drawingComplete');
-                self.drawCount(-1);
-            });
-        } else {
-            this.drawWithCoords(expression, this[funcType](arg));
-        }
+        if (!expression.hide) {
+            var self = this;
 
+            var funcType = (expression.literal.domain ? 'parametric' : 'equation') + 'ToCoords';
+            var arg = this.cwArg(expression);
+
+            if (this.CW_ON) {
+                this.drawCount(1);
+                this._drawingWorker[funcType](arg).then(function (result) {
+                    self.drawWithCoords(expression, result);
+                    self.trigger('drawingComplete');
+                    self.drawCount(-1);
+                });
+            } else {
+                this.drawWithCoords(expression, this[funcType](arg));
+            }
+        }
         return this;
     };
 
@@ -465,7 +468,13 @@ define([
         });
     };
 
-    _prototype_.erasure = function () {
+    _prototype_.erasure = function (expression) {
+        var size = this.size();
+        expression.canvas.clearRect(0, 0, size[0], size[1]);
+        return this;
+    };
+
+    _prototype_.erasureAll = function () {
         var size = this.size();
         this.$wrap.find('canvas').each(function () {
             $(this)[0].getContext('2d').clearRect(0, 0, size[0], size[1]);
@@ -479,7 +488,7 @@ define([
         this.origin(origin);
         return this
             .range()
-            .erasure()
+            .erasureAll()
             .drawGrid()
             .drawAxis()
             .drawExpressions();

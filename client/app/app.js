@@ -33,7 +33,7 @@ define([
         this.STATE_ON = '+';
         this.STATE_OFF = '-';
         this.EXPRESSIONS = [
-            ['y=x'],
+            ['y=x', '', 1],
             ['y=x%2', '0f0'],
             //['y=10*sin(x)/x', 'f0f'],
             //['y=1/x', '393'],
@@ -43,7 +43,7 @@ define([
             //['x=q*cos(q);y=q*sin(q);q=[-1.5*PI,1.5*PI];', 'ff0'],
             //['x=6*cos(q);y=3*sin(q);q=[0,2*PI];', 'f0f']
         ];
-        this.EXPRESSIONS = [];
+        //this.EXPRESSIONS = [];
 
         this.$window = $(window);
         this.$body = $('body');
@@ -133,12 +133,17 @@ define([
         $('.edit-btn', funcLis).on('click', function (event) {
             event.stopPropagation();
             var index = $(this).attr('data-index');
-            self.onEditFunc(self.diagraph.expressions[index], index);
+            self.onEditFunc(index);
         });
         $('.delete-btn', funcLis).on('click', function (event) {
             event.stopPropagation();
             var index = $(this).attr('data-index');
             self.onDeleteFunc(index);
+        });
+        $('.show-on-btn', funcLis).on('click', function (event) {
+            event.stopPropagation();
+            var index = $(this).attr('data-index');
+            self.onToggleFunc(index);
         });
 
         self.$funcList.html(funcLis);
@@ -403,16 +408,18 @@ define([
         return this;
     };
 
-    _prototype_.onEditFunc = function (exp, index) {
+    _prototype_.onEditFunc = function (index) {
         if (!this.EDITOR_ON) {
             this.EDITOR_ON = true;
             this.$editor.addClass('animate');
-            var expr = exp.expression;
-            if (expr.domain) {
-                this.$funcTextarea.val(expr.x + ';\n' + expr.y + ';\n' + expr.domain + ';');
+
+            var exp = this.diagraph.expressions[index];
+            if (exp.domain) {
+                this.$funcTextarea.val(exp.x + ';\n' + exp.y + ';\n' + exp.domain + ';');
             } else {
-                this.$funcTextarea.val(expr + ';');
+                this.$funcTextarea.val(exp + ';');
             }
+
             this.editingFuncIndex = index;
             this.palette.setSelected(this.palette.map[exp.rgb].$a);
             this.refreshEditor(this.EDITOR_ON);
@@ -425,6 +432,23 @@ define([
             this.refreshState({exprsEncode: parser.encode(this.EXPRESSIONS)});
             this.refreshFuncList();
             this.refreshDashboard(this.DASHBOARD_ON);
+        }
+    };
+
+    _prototype_.onToggleFunc = function (index) {
+        var exp = this.diagraph.expressions[index];
+        var $btn = $('li .show-on-btn', this.$funcList).eq(index);
+        if (exp) {
+            exp.hide = !exp.hide;
+            if (exp.hide) {
+                this.diagraph.erasure(exp);
+                $btn.addClass('hide');
+            } else {
+                this.diagraph.drawExpression(exp);
+                $btn.removeClass('hide');
+            }
+            this.EXPRESSIONS = this.diagraph.getExpressionsArray();
+            this.refreshState({exprsEncode: parser.encode(this.EXPRESSIONS)});
         }
     };
 
