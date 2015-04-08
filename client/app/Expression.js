@@ -9,11 +9,14 @@ define([], function () {
     function Expression(literal, color, hide) {
         this.rgb = (color || '#333').replace(/#/g, '');
         this.color = '#' + this.rgb;
-        this.hide = !!hide;
+        this.hide = hide === Expression.STATE_ON;
         this.literal = {};
         this.expression = {};
         this.split(this.calibrate(this.trim(literal)));
     }
+
+    Expression.STATE_ON = '+';
+    Expression.STATE_OFF = '-';
 
     Expression.MATH_FUNC = {
         'Math.abs': 'abs',
@@ -34,11 +37,12 @@ define([], function () {
 
     Expression.OPTS = {
         '=': ' = ',
-        '\\+': ' + ',
-        '-': ' - ',
-        '\\*': ' * ',
-        '\\/': ' / ',
-        '%': ' % '
+        ',': ', '
+        //'\\+': ' + ',
+        //'-': ' - ',
+        //'\\*': ' * ',
+        //'\\/': ' / ',
+        //'%': ' % '
     };
 
     Expression.VAR_X = 'x';
@@ -55,6 +59,7 @@ define([], function () {
         try {
             func = new Function(varName, 'return ' + literal + ';');
         } catch (err) {
+            this.error = true;
             console.error(err);
             func = null;
         }

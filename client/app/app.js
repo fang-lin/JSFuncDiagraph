@@ -33,15 +33,14 @@ define([
         this.STATE_ON = '+';
         this.STATE_OFF = '-';
         this.EXPRESSIONS = [
-            ['y=x', '', 1],
-            ['y=x%2', '0f0'],
-            //['y=10*sin(x)/x', 'f0f'],
-            //['y=1/x', '393'],
-            ['x=4*(sin(2*q)+0.2*sin(100*q))*cos(q);y=4*(sin(2*q)+0.2*sin(100*q))*sin(q);q=[0,2*PI]', '00f']
-            //['x=4*cos(8*q)*cos(q);y=4*cos(8*q)*sin(q);q=[0,2*PI];', '0f0'],
-            //['x=4*cos(2*q)*cos(q);y=4*cos(2*q)*sin(q);q=[0,2*PI];', '0ff'],
-            //['x=q*cos(q);y=q*sin(q);q=[-1.5*PI,1.5*PI];', 'ff0'],
-            //['x=6*cos(q);y=3*sin(q);q=[0,2*PI];', 'f0f']
+            ['x=4*cos(2*q)*cos(q);y=4*cos(2*q)*sin(q);q=[0,2*PI]', 'f33'],
+            ['x=q*cos(q);y=q*sin(q);q=[-2.5*PI,2.5*PI]', '3f3'],
+            ['x=4*(sin(2*q)+0.2*sin(100*q))*cos(q);y=4*(sin(2*q)+0.2*sin(100*q))*sin(q);q=[0,2*PI]', '33f'],
+            ['x=4*cos(8*q)*cos(q);y=4*cos(8*q)*sin(q);q=[0,2*PI]', 'f93'],
+            ['x=q*cos(q);y=q*sin(q);q=[0,10*PI]', '09f'],
+            ['x=3*cos(3*q)*cos(q+2);y=3*cos(3*q)*sin(q+2);q=[0,2*PI]', 'f3f'],
+            ['x=2*(sin(q)-0.5*sin(2*q));y=2*sin(q);q=[0,2*PI]', 'f63'],
+            ['x=2*(cos(q)-0.5*cos(2*q));y=2*(sin(q)-0.5*sin(2*q));q=[0,2*PI]', '6f9']
         ];
         //this.EXPRESSIONS = [];
 
@@ -101,6 +100,7 @@ define([
                 self.CURSOR_ON = cursorOn === self.STATE_ON;
                 self.DASHBOARD_ON = dashboardOn === self.STATE_ON;
                 self.EXPRESSIONS = parser.decode(exprsEncode);
+                console.log(self.EXPRESSIONS);
 
                 self.diagraph.batchExpressions(self.EXPRESSIONS);
 
@@ -152,8 +152,8 @@ define([
     _prototype_.onEvents = function () {
         var self = this;
 
-        this.diagraph.on('drawing', function () {
-            self.$drawingState.html('drawing...');
+        this.diagraph.on('computing', function () {
+            self.$drawingState.html('computing...');
         }).on('completed', function () {
             self.$drawingState.html('');
         });
@@ -268,7 +268,6 @@ define([
 
             if (self.editingFuncIndex == null) {
                 // new add
-
                 if (expr.error) {
                     console.log('error');
                 } else {
@@ -278,11 +277,30 @@ define([
                     self.refreshFuncList();
                     self.refreshDashboard(self.DASHBOARD_ON);
                     self.diagraph.drawExpression(expr);
+
+                    self.EDITOR_ON = false;
+                    self.refreshEditor(self.EDITOR_ON);
                 }
 
             } else {
                 // edit
-                console.log('edit');
+                if (expr.error) {
+                    console.log('error');
+                } else {
+                    var older = self.diagraph.expressions[self.editingFuncIndex];
+                    expr.$canvas = older.$canvas;
+                    expr.canvas = older.canvas;
+                    self.diagraph.expressions[self.editingFuncIndex] = expr;
+                    self.EXPRESSIONS = self.diagraph.getExpressionsArray();
+                    self.refreshState({exprsEncode: parser.encode(self.EXPRESSIONS)});
+                    self.refreshFuncList();
+                    self.refreshDashboard(self.DASHBOARD_ON);
+                    self.diagraph.erasure(expr);
+                    self.diagraph.drawExpression(expr);
+
+                    self.EDITOR_ON = false;
+                    self.refreshEditor(self.EDITOR_ON);
+                }
             }
         });
 
@@ -414,10 +432,11 @@ define([
             this.$editor.addClass('animate');
 
             var exp = this.diagraph.expressions[index];
-            if (exp.domain) {
-                this.$funcTextarea.val(exp.x + ';\n' + exp.y + ';\n' + exp.domain + ';');
+            var formated = exp.expression;
+            if (formated.domain) {
+                this.$funcTextarea.val(formated.x + ';\n' + formated.y + ';\n' + formated.domain + ';');
             } else {
-                this.$funcTextarea.val(exp + ';');
+                this.$funcTextarea.val(formated + ';');
             }
 
             this.editingFuncIndex = index;

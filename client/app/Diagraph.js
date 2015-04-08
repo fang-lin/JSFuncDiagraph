@@ -42,6 +42,8 @@ define([
     Diagraph.CHORD_FIELD = [0.9, 1.1];
     Diagraph.MAX_ITERATION = 4294967296;
     Diagraph.MAX_DELTA_RECOUNT = 16;
+    Diagraph.STATE_ON = '+';
+    Diagraph.STATE_OFF = '-';
 
     var _prototype_ = Diagraph.prototype;
 
@@ -81,8 +83,8 @@ define([
         var size = this.size();
 
         context.beginPath();
-        context.moveTo(0.5, origin[1]);
-        context.lineTo(size[0] + 0.5, origin[1]);
+        context.moveTo(0, origin[1] + 0.5);
+        context.lineTo(size[0], origin[1] + 0.5);
         context.moveTo(origin[0] + 0.5, 0);
         context.lineTo(origin[0] + 0.5, size[1]);
         context.strokeStyle = this.AXIS_COLOR;
@@ -107,8 +109,8 @@ define([
         }
         while (y < size[1]) {
             y += zoom;
-            context.moveTo(0.5, y);
-            context.lineTo(size[0] + 0.5, y);
+            context.moveTo(0, y + 0.5);
+            context.lineTo(size[0], y + 0.5);
         }
         context.strokeStyle = this.GRID_COLOR;
         context.stroke();
@@ -144,8 +146,9 @@ define([
     _prototype_.drawCount = function (delta) {
         this._drawCount += delta;
         if (this._drawCount > 0) {
-            this.trigger('drawing');
+            this.trigger('computing');
         } else {
+            this._drawCount = 0;
             this.trigger('completed');
         }
     };
@@ -158,7 +161,7 @@ define([
             } else {
                 literal = exp.expression;
             }
-            return [literal, exp.rgb, exp.hide ? 1 : 0];
+            return [literal, exp.rgb, exp.hide ? Diagraph.STATE_ON : Diagraph.STATE_OFF];
         });
     };
 
@@ -267,7 +270,6 @@ define([
         }
 
         do {
-
             if (isNaN(y) || Math.abs(y) >= MAX_VALUE || y < range[3] || y > range[1]) {
 
                 if (!overflow && dx < 0) {
@@ -402,11 +404,14 @@ define([
     };
 
     _prototype_.initDrawingWorker = function (workersSize) {
+        var self = this;
+
         this._drawingWorker = cw({
             equationToCoords: this.equationToCoords,
             parametricToCoords: this.parametricToCoords
         }, workersSize).on('error', function (err) {
-            console.log(err);
+            console.error(err);
+            self.drawCount(-1);
         });
 
         return this;
@@ -448,8 +453,8 @@ define([
 
             if (this.CW_ON) {
                 this.drawCount(1);
-                this._drawingWorker[funcType](arg).then(function (result) {
-                    self.drawWithCoords(expression, result);
+                this._drawingWorker[funcType](arg).then(function (coords) {
+                    self.drawWithCoords(expression, coords);
                     self.trigger('drawingComplete');
                     self.drawCount(-1);
                 });

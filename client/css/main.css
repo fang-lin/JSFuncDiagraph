@@ -309,6 +309,12 @@ button {
 #dashboard #func-list li .col1 .show-on-btn:hover {
   background-position: -4px -418px;
 }
+#dashboard #func-list li .col1 .show-on-btn.hide {
+  background-position: -4px -340px;
+}
+#dashboard #func-list li .col1 .show-on-btn.hide:hover {
+  background-position: -4px -392px;
+}
 #dashboard #func-list li .col2 {
   margin: 0 42px 0 32px;
   padding: 5px 8px;
