@@ -522,7 +522,7 @@ button {
 }
 #func-editor #func-textarea-wrap textarea {
   outline: medium none;
-  border: solid 1px #999999;
+  border: solid 1px #999;
   padding: 5px;
   font-size: 12px;
   line-height: 16px;
@@ -530,6 +530,16 @@ button {
   width: 100%;
   height: 96px;
   resize: none;
+}
+#func-editor #func-textarea-wrap textarea.error {
+  border-color: #f33;
+  background-color: #fdd;
+}
+#func-editor #func-textarea-wrap textarea.fade-out {
+  -webkit-transition: all 5s;
+  -moz-transition: all 5s;
+  -ms-transition: all 5s;
+  -o-transition: all 5s;
 }
 #func-editor #func-textarea-wrap:after {
   content: ' ';

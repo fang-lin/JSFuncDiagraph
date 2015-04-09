@@ -262,7 +262,10 @@ define([
             var expr = new Expression(self.$funcTextarea.val(), self.palette.selectedColor);
 
             if (expr.error) {
-                console.log('error');
+                self.$funcTextarea.addClass('error').removeClass('fade-out').focus();
+                setTimeout(function () {
+                    self.$funcTextarea.removeClass('error').addClass('fade-out');
+                }, 500);
             } else {
                 if (self.editingFuncIndex == null) {
                     // new add

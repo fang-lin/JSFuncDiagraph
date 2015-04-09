@@ -11,8 +11,8 @@ define([
 
     function Diagraph($wrap, size) {
         this.ZOOM_RANGE = [2, 500];
-        this.AXIS_COLOR = '#666';
-        this.GRID_COLOR = '#ccc';
+        this.AXIS_COLOR = '#333';
+        this.GRID_COLOR = '#eee';
         this.SMOOTH = true;
         this.CW_ON = true;
 
@@ -83,10 +83,11 @@ define([
         var size = this.size();
 
         context.beginPath();
-        context.moveTo(0, origin[1] + 0.5);
-        context.lineTo(size[0], origin[1] + 0.5);
-        context.moveTo(origin[0] + 0.5, 0);
-        context.lineTo(origin[0] + 0.5, size[1]);
+        context.moveTo(0, Math.floor(origin[1]) + 0.5);
+        context.lineTo(size[0], Math.floor(origin[1]) + 0.5);
+        context.moveTo(Math.floor(origin[0]) + 0.5, 0);
+        context.lineTo(Math.floor(origin[0]) + 0.5, size[1]);
+
         context.strokeStyle = this.AXIS_COLOR;
         context.stroke();
 
