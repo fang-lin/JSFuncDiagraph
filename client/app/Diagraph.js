@@ -12,7 +12,7 @@ define([
     function Diagraph($wrap, size) {
         this.ZOOM_RANGE = [2, 500];
         this.AXIS_COLOR = '#666';
-        this.GRID_COLOR = '#eee';
+        this.GRID_COLOR = '#ccc';
         this.SMOOTH = true;
         this.CW_ON = true;
 
