@@ -100,7 +100,6 @@ define([
                 self.CURSOR_ON = cursorOn === self.STATE_ON;
                 self.DASHBOARD_ON = dashboardOn === self.STATE_ON;
                 self.EXPRESSIONS = parser.decode(exprsEncode);
-                console.log(self.EXPRESSIONS);
 
                 self.diagraph.batchExpressions(self.EXPRESSIONS);
 
@@ -245,13 +244,9 @@ define([
 
         this.$addFuncBtn.on('click', function (event) {
             event.stopPropagation();
-            if (!self.EDITOR_ON) {
-                self.EDITOR_ON = true;
-                self.$editor.addClass('animate');
-                self.$funcTextarea.val('');
-                self.palette.setSelectedRandom();
-                self.refreshEditor(self.EDITOR_ON);
-            }
+            self.onToggleEditor(true);
+            self.$funcTextarea.val('');
+            self.palette.setSelectedRandom();
         });
 
         this.$closeEditorBtn.on('click', function (event) {
@@ -266,41 +261,29 @@ define([
 
             var expr = new Expression(self.$funcTextarea.val(), self.palette.selectedColor);
 
-            if (self.editingFuncIndex == null) {
-                // new add
-                if (expr.error) {
-                    console.log('error');
-                } else {
-                    self.diagraph.pushExpression(expr);
-                    self.EXPRESSIONS = self.diagraph.getExpressionsArray();
-                    self.refreshState({exprsEncode: parser.encode(self.EXPRESSIONS)});
-                    self.refreshFuncList();
-                    self.refreshDashboard(self.DASHBOARD_ON);
-                    self.diagraph.drawExpression(expr);
-
-                    self.EDITOR_ON = false;
-                    self.refreshEditor(self.EDITOR_ON);
-                }
-
+            if (expr.error) {
+                console.log('error');
             } else {
-                // edit
-                if (expr.error) {
-                    console.log('error');
+                if (self.editingFuncIndex == null) {
+                    // new add
+                    self.diagraph.pushExpression(expr);
                 } else {
-                    var older = self.diagraph.expressions[self.editingFuncIndex];
+                    // edit
+                    var index = self.editingFuncIndex;
+                    var older = self.diagraph.expressions[index];
                     expr.$canvas = older.$canvas;
                     expr.canvas = older.canvas;
-                    self.diagraph.expressions[self.editingFuncIndex] = expr;
-                    self.EXPRESSIONS = self.diagraph.getExpressionsArray();
-                    self.refreshState({exprsEncode: parser.encode(self.EXPRESSIONS)});
-                    self.refreshFuncList();
-                    self.refreshDashboard(self.DASHBOARD_ON);
+                    self.diagraph.expressions[index] = expr;
                     self.diagraph.erasure(expr);
-                    self.diagraph.drawExpression(expr);
-
-                    self.EDITOR_ON = false;
-                    self.refreshEditor(self.EDITOR_ON);
+                    self.editingFuncIndex = null;
                 }
+
+                self.refreshFuncList();
+                self.EXPRESSIONS = self.diagraph.getExpressionsArray();
+                self.refreshState({exprsEncode: parser.encode(self.EXPRESSIONS)});
+                self.refreshDashboard(self.DASHBOARD_ON);
+                self.diagraph.drawExpression(expr);
+                self.onToggleEditor(false);
             }
         });
 
@@ -426,23 +409,25 @@ define([
         return this;
     };
 
+    _prototype_.onToggleEditor = function (onOpen) {
+        this.EDITOR_ON = !!onOpen;
+        this.$editor.addClass('animate');
+        this.refreshEditor(this.EDITOR_ON);
+    };
+
     _prototype_.onEditFunc = function (index) {
-        if (!this.EDITOR_ON) {
-            this.EDITOR_ON = true;
-            this.$editor.addClass('animate');
+        this.onToggleEditor(true);
 
-            var exp = this.diagraph.expressions[index];
-            var formated = exp.expression;
-            if (formated.domain) {
-                this.$funcTextarea.val(formated.x + ';\n' + formated.y + ';\n' + formated.domain + ';');
-            } else {
-                this.$funcTextarea.val(formated + ';');
-            }
-
-            this.editingFuncIndex = index;
-            this.palette.setSelected(this.palette.map[exp.rgb].$a);
-            this.refreshEditor(this.EDITOR_ON);
+        var exp = this.diagraph.expressions[index];
+        var literal = exp.expression;
+        if (literal.domain) {
+            this.$funcTextarea.val(literal.x + ';\n' + literal.y + ';\n' + literal.domain + ';');
+        } else {
+            this.$funcTextarea.val(literal + ';');
         }
+
+        this.editingFuncIndex = index;
+        this.palette.setSelected(this.palette.map[exp.rgb].$a);
     };
 
     _prototype_.onDeleteFunc = function (index) {
@@ -543,5 +528,4 @@ define([
     };
 
     var app = new App();
-    console.log(app);
 });

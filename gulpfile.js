@@ -7,7 +7,7 @@ var gulp = require('gulp'),
     util = require('gulp-util'),
     bower = require('gulp-bower'),
     concat = require('gulp-concat'),
-    clean = require('gulp-clean'),
+    del = require('del'),
     jshint = require('gulp-jshint'),
     nodemon = require('gulp-nodemon'),
     buster = require('gulp-buster'),
@@ -17,14 +17,14 @@ var gulp = require('gulp'),
     amdOptimize = require('amd-optimize'),
     rename = require('gulp-rename'),
     copy2 = require('gulp-copy2'),
-    sh = require('shelljs'),
+//sh = require('shelljs'),
     path = require('path'),
-    gulpIf = require('gulp-if'),
-    //sprite = require('css-sprite').stream,
-    Q = require('q'),
-    _ = require('underscore'),
-    fs = require('fs'),
-    config = require('./config');
+    gulpIf = require('gulp-if');
+//sprite = require('css-sprite').stream,
+//    Q = require('q'),
+//    _ = require('underscore'),
+//    fs = require('fs'),
+//    config = require('./config');
 
 // region lint
 
@@ -116,9 +116,10 @@ gulp.task('git-hook', function (done) {
 // endregion git-hook
 // region clean
 
-gulp.task('clean', function () {
-    return gulp.src('./dist/*')
-        .pipe(clean());
+gulp.task('clean', function (cb) {
+    return del([
+        './dist/**'
+    ], cb);
 });
 
 // endregion clean

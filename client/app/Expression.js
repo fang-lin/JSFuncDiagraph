@@ -59,8 +59,7 @@ define([], function () {
         try {
             func = new Function(varName, 'return ' + literal + ';');
         } catch (err) {
-            this.error = true;
-            console.error(err);
+            this.error = err;
             func = null;
         }
         return func;
