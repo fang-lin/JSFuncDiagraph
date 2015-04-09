@@ -157,12 +157,12 @@ define([], function () {
         var MATH_FUNC = Expression.MATH_FUNC;
         for (var opt in OPTS) {
             if (OPTS.hasOwnProperty(opt)) {
-                literal = literal.replace(eval('/' + opt + '/g'), OPTS[opt]);
+                literal = literal.replace(new RegExp(opt, 'g'), OPTS[opt]);
             }
         }
         for (var func in MATH_FUNC) {
             if (MATH_FUNC.hasOwnProperty(func)) {
-                literal = literal.replace(eval('/' + func + '/g'), MATH_FUNC[func]);
+                literal = literal.replace(new RegExp(func, 'g'), MATH_FUNC[func]);
             }
         }
         return literal;
