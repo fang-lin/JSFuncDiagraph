@@ -157,14 +157,13 @@ define([
             self.$drawingState.html('');
         });
 
-        $('#bl-panel button, #br-panel button, #dashboard, #func-editor, #func-editor-bg')
-            .on('mousedown', function (event) {
-                event.stopPropagation();
-            }).on('mouseup', function (event) {
-                event.stopPropagation();
-            }).on('mousewheel', function (event) {
-                event.stopPropagation();
-            });
+        $('#bl-panel button, #br-panel button, #dashboard, #func-editor, #func-editor-bg').on('mousedown', function (event) {
+            event.stopPropagation();
+        }).on('mouseup', function (event) {
+            event.stopPropagation();
+        }).on('mousewheel', function (event) {
+            event.stopPropagation();
+        });
 
         this.$window
             .on('resize', _.throttle(function () {
