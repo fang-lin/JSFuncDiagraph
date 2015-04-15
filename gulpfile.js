@@ -42,7 +42,7 @@ gulp.task('lint', function () {
 // endregion lint
 // region less
 
-gulp.task('less', function () {
+gulp.task('less', ['bower'], function () {
     return gulp.src('client/css/main.less')
         .pipe(less())
         .on('error', function (err) {
