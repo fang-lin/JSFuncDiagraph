@@ -522,11 +522,17 @@ define([
 
     _prototype_.toOrigin = function (origin) {
         var size = this.diagraph.size();
+        var x = origin[0] - size[0] / 2;
+        var y = origin[1] - size[1] / 2;
 
-        return [
-            origin[0] - size[0] / 2,
-            origin[1] - size[1] / 2
-        ];
+        if (Number.isNaN(x) || typeof x !== 'number') {
+            x = 0;
+        }
+        if (Number.isNaN(y) || typeof y !== 'number') {
+            y = 0;
+        }
+
+        return [x, y];
     };
 
     var app = new App();
