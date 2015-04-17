@@ -1,5 +1,8 @@
-JSFuncDiagraph is a mathematical function diagraph written by javascript
+JSFuncDiagraph
 =====
+
+a mathematical function diagraph written by javascript
+-----
 
 Prerequisites
 -----
