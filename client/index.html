@@ -14,11 +14,11 @@
     <link rel="shortcut icon" href="favicon.ico">
     <link rel="stylesheet" href="css/main.css"/>
 
-    <title>JSFuncDiagraph v2</title>
+    <title>JSFuncDiagraph 2.2.1</title>
 </head>
 <body>
 <div id="tl-panel">
-    <h1>JSFuncDiagraph v2 <span id="drawing-state"></span></h1>
+    <h1>JSFuncDiagraph 2.2.1<span id="drawing-state"></span></h1>
 
     <div class="cursor-coordinate"> x: <span id="cursor-x">-</span></div>
     <div class="cursor-coordinate"> y: <span id="cursor-y">-</span></div>
@@ -27,64 +27,11 @@
     <h2>
         <span class="title">Dashboard</span>
         <span class="menu">
-            <a href="">Help</a>
-            <a href="">About</a>
+            <a id="help-btn">Help</a>
+            <a id="about-btn">About</a>
         </span>
     </h2>
-    <ul id="func-list">
-        <li>
-            <div class="col1">
-                <button class="show-on-btn"></button>
-            </div>
-            <div class="col2">
-                <p>x = 4 * (sin(2 * q) + 0.2 * sin(100 * q)) * cos(q)</p>
-
-                <p>y = 4 * (sin(2 * q) + 0.2 * sin(100 * q)) * sin(q)</p>
-
-                <p>q = [0,2 * PI]</p>
-            </div>
-            <div class="col3">
-                <button class="delete-btn" title="Delete">Delete</button>
-                <button class="edit-btn" title="Edit">Edit</button>
-            </div>
-        </li>
-        <li>
-            <div class="col1">
-                <button class="show-on-btn" title="Show: -">Show: -</button>
-            </div>
-            <div class="col2">
-                <p>y=pow(x,2)</p>
-            </div>
-            <div class="col3">
-                <button class="delete-btn" title="Delete">Delete</button>
-                <button class="edit-btn" title="Edit">Edit</button>
-            </div>
-        </li>
-        <li>
-            <div class="col1">
-                <button class="show-on-btn" title="Show: -">Show: -</button>
-            </div>
-            <div class="col2">
-                <p>y=pow(x,2)</p>
-            </div>
-            <div class="col3">
-                <button class="delete-btn" title="Delete">Delete</button>
-                <button class="edit-btn" title="Edit">Edit</button>
-            </div>
-        </li>
-        <li>
-            <div class="col1">
-                <button class="show-on-btn" title="Show: -">Show: -</button>
-            </div>
-            <div class="col2">
-                <p>y=pow(x,2)</p>
-            </div>
-            <div class="col3">
-                <button class="delete-btn" title="Delete">Delete</button>
-                <button class="edit-btn" title="Edit">Edit</button>
-            </div>
-        </li>
-    </ul>
+    <ul id="func-list"></ul>
     <div id="add-func">
         <span>Add Function</span>
         <button id="add-func-btn" title="Add Function">Add Function</button>
@@ -103,12 +50,12 @@
     <button id="zoom-out-btn" title="Zoom Out">Zoom Out</button>
     <button id="zoom-level" title="x7" class="x7">x7</button>
 </div>
-<div id="func-editor-bg"></div>
-<div id="func-editor-wrap">
-    <div id="func-editor">
+<div id="dropbox-bg"></div>
+<div class="dropbox-wrap">
+    <div class="dropbox" id="func-editor">
         <h2>
             <span class="title">Edit Function</span>
-            <button id="close-func-editor-btn"></button>
+            <button class="close-dropbox-btn" id="close-func-editor-btn"></button>
         </h2>
         <div id="func-textarea-wrap">
             <textarea name="" id="func-textarea" cols="30" rows="5"></textarea>
@@ -116,6 +63,72 @@
         <div id="footer">
             <div id="palette"></div>
             <button id="submit-btn"></button>
+        </div>
+    </div>
+    <div class="dropbox" id="about">
+        <h2>
+            <span class="title">About</span>
+            <button class="close-dropbox-btn" id="close-about-btn"></button>
+        </h2>
+        <div class="dropbox-inner">
+            <h3>JSFuncDiagraph 2.2.1</h3>
+
+            <p>JSFuncDiagraph is a mathematical function diagraph written by javascript.</p>
+
+            <p>Copyright © 2015 fanglin.name. All rights reserved.</p>
+        </div>
+    </div>
+    <div class="dropbox" id="help">
+        <h2>
+            <span class="title">Help</span>
+            <button class="close-dropbox-btn" id="close-help-btn"></button>
+        </h2>
+        <div class="dropbox-inner">
+            <h3>Symbol</h3>
+
+            <p>
+                Plus : +<br/>
+
+                Minus : -<br/>
+
+                Product : *<br/>
+
+                Division : /
+            </p>
+
+            <h3>Function</h3>
+
+            <p>
+                Power : pow(x, n)<br/>
+
+                Natural Logarithm : log(x)<br/>
+
+                Trigonometric : sin(x), cos(x), tan(x), arcsin(x), arccos(x), arctan(x)<br/>
+
+                Absolute : abs(x)<br/>
+
+                Floor : floor(x)<br/>
+
+                Ceil : ceil(x)<br/>
+
+                Round : round(x)
+            </p>
+
+            <h3>Constant</h3>
+
+            <p>
+                PI, E
+            </p>
+
+            <h3>Example</h3>
+
+            <p>
+                y = log(x)<br/>
+
+                y = arctan(x)<br/>
+
+                y = 1/(1-pow(E, x/(1-x)))
+            </p>
         </div>
     </div>
 </div>

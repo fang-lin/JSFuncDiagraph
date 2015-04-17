@@ -17,14 +17,9 @@ var gulp = require('gulp'),
     amdOptimize = require('amd-optimize'),
     rename = require('gulp-rename'),
     copy2 = require('gulp-copy2'),
-//sh = require('shelljs'),
     path = require('path'),
+    //sprite = require('css-sprite').stream,
     gulpIf = require('gulp-if');
-//sprite = require('css-sprite').stream,
-//    Q = require('q'),
-//    _ = require('underscore'),
-//    fs = require('fs'),
-//    config = require('./config');
 
 // region lint
 
@@ -42,7 +37,16 @@ gulp.task('lint', function () {
 // endregion lint
 // region less
 
-gulp.task('less', ['bower'], function () {
+gulp.task('less', function () {
+    return gulp.src('client/css/main.less')
+        .pipe(less())
+        .on('error', function (err) {
+            util.log(util.colors.red(err));
+        })
+        .pipe(gulp.dest('client/css/'));
+});
+
+gulp.task('bower-less', ['bower'], function () {
     return gulp.src('client/css/main.less')
         .pipe(less())
         .on('error', function (err) {
@@ -58,7 +62,7 @@ gulp.task('nodemon', function () {
     nodemon({
         script: 'app.js',
         ext: 'js json',
-        ignore: ['node_modules/*', 'client/*', 'dist/*'],
+        ignore: ['node_modules/*', 'client/*', 'dist/*', 'gulpfile.js'],
         env: {'NODE_ENV': 'DEVELOPMENT'}
     }).on('restart', function () {
         util.log(util.colors.cyan('nodemon restarted'));
@@ -82,20 +86,20 @@ gulp.task('bower', ['clean'], function (done) {
 
 // endregion bower
 
-//gulp.task('sprites', function () {
-//    return gulp.src('./client/img/slice/*.png')
-//        .pipe(sprite({
-//            name: 'buttons',
-//            style: 'buttons.less',
-//            cssPath: '../img/',
-//            processor: 'less'
-//        }))
-//        .pipe(gulpIf('*.png', gulp.dest('./client/img/'), gulp.dest('./client/css/')))
-//});
+gulp.task('sprites', function () {
+    return gulp.src('./client/img/slice/*.png')
+        .pipe(sprite({
+            name: 'buttons',
+            style: 'buttons.less',
+            cssPath: '../img/',
+            processor: 'less'
+        }))
+        .pipe(gulpIf('*.png', gulp.dest('./client/img/'), gulp.dest('./client/css/')))
+});
 
 // region minify-css
 
-gulp.task('minify-css', ['less'], function () {
+gulp.task('minify-css', ['bower-less'], function () {
     return gulp.src('client/css/main.css')
         .pipe(minifyCss({
             keepSpecialComments: 0

@@ -14,7 +14,7 @@ define([
     'use strict';
 
     function App() {
-        this.init().refreshSize().onEvents().initRouter();
+        this.init().refreshSize().adjustFuncListHeight().onEvents().initRouter();
     }
 
     var _prototype_ = App.prototype;
@@ -27,6 +27,8 @@ define([
         this.CURSOR_ON = true;
         this.DASHBOARD_ON = true;
         this.EDITOR_ON = false;
+        this.ABOUT_ON = false;
+        this.HELP_ON = false;
         this.DELTA_SUM = 0;
         this.ON = 'on';
         this.OFF = 'off';
@@ -58,10 +60,14 @@ define([
         this.$dashboardToggleBtn = $('#dashboard-toggle-btn');
         this.$funcList = $('#func-list');
         this.$editor = $('#func-editor');
-        this.$editorBg = $('#func-editor-bg');
+        this.$about = $('#about');
+        this.$help = $('#help');
+        this.$dropboxBg = $('#dropbox-bg');
         this.$funcTextarea = $('#func-textarea');
         this.$addFuncBtn = $('#add-func-btn');
-        this.$closeEditorBtn = $('#close-func-editor-btn');
+        this.$aboutBtn = $('#about-btn');
+        this.$helpBtn = $('#help-btn');
+        this.$closeDropboxBtn = $('.close-dropbox-btn');
         this.$submitBtn = $('#submit-btn');
 
         this.$drawingState = $('#drawing-state');
@@ -107,7 +113,6 @@ define([
                 self.refreshCursorBtn(self.CURSOR_ON);
                 self.refreshFuncList();
                 self.refreshDashboard(self.DASHBOARD_ON);
-                self.refreshEditor(self.EDITOR_ON);
                 self.refreshZoomLevel(self.ZOOM_LEVEL);
 
                 self.diagraph.zoom(_zoom);
@@ -157,21 +162,22 @@ define([
             self.$drawingState.html('');
         });
 
-        $('#bl-panel button, #br-panel button, #dashboard, #func-editor, #func-editor-bg').on('mousedown', function (event) {
+        $('#bl-panel button, #br-panel button, #dashboard, #func-editor, #about, #help, #dropbox-bg').on('mousedown', function (event) {
             event.stopPropagation();
         }).on('mouseup', function (event) {
-            event.stopPropagation();
+            if ($._data(self.$window[0], 'events').mousemove[0].namespace !== 'drag') {
+                event.stopPropagation();
+            }
         }).on('mousewheel', function (event) {
             event.stopPropagation();
         });
 
         this.$window
             .on('resize', _.throttle(function () {
-                self.refreshSize();
+                self.refreshSize().adjustFuncListHeight();
                 self.diagraph.redraw(self.SIZE);
             }, 800))
             .on('mousemove.crossCursor', function (event) {
-                event.stopPropagation();
                 self.onMouseMoveCrossCursor();
             })
             .on('mousedown', function (event) {
@@ -180,14 +186,12 @@ define([
                 self.$window.on('mousemove.drag', function (event) {
                     self.onDragging(event);
                 });
-                self.$window.off('mousemove.crossCursor', function (event) {
-                    self.onMouseMoveCrossCursor(event);
-                });
+                self.$window.off('mousemove.crossCursor');
             })
             .on('mouseup', function (event) {
                 event.stopPropagation();
                 self.$window.off('mousemove.drag');
-                self.$window.on('mousemove.crossCursor', function (event) {
+                self.$window.on('mousemove.crossCursor', function () {
                     self.onMouseMoveCrossCursor();
                 });
                 self.onDragEnd(event);
@@ -248,12 +252,33 @@ define([
             self.palette.setSelectedRandom();
         });
 
-        this.$closeEditorBtn.on('click', function (event) {
+        this.$aboutBtn.on('click', function (event) {
             event.stopPropagation();
-            if (self.EDITOR_ON) {
-                self.EDITOR_ON = false;
-                self.refreshEditor(self.EDITOR_ON);
-            }
+            self.onShowAbout();
+        });
+
+        this.$helpBtn.on('click', function (event) {
+            event.stopPropagation();
+            self.onShowHelp();
+        });
+        this.$closeDropboxBtn.on('click', function (event) {
+            event.stopPropagation();
+            [{
+                dom: self.$editor,
+                on: self.EDITOR_ON
+            }, {
+                dom: self.$about,
+                on: self.ABOUT_ON
+            }, {
+                dom: self.$help,
+                on: self.HELP_ON
+            }]
+                .forEach(function (item) {
+                    if (item.on) {
+                        item.on = false;
+                        self.refreshDropbox(item.dom, item.on);
+                    }
+                });
         });
 
         this.$submitBtn.on('click', function (event) {
@@ -322,10 +347,22 @@ define([
         var title = 'x' + zoomLevel;
         this.$zoomLevel.html(title).attr('title', title);
         this.$zoomLevel.removeClass().addClass('x' + zoomLevel);
+
+        return this;
+    };
+
+    _prototype_.adjustFuncListHeight = function () {
+        this.$funcList.css('max-height', this.$body.height() - 160);
+        if (!this.DASHBOARD_ON) {
+            this.refreshDashboard(this.DASHBOARD_ON);
+        }
+
+        return this;
     };
 
     _prototype_.refreshSize = function () {
         this.SIZE = [this.$body.width(), this.$body.height()];
+
         return this;
     };
 
@@ -344,16 +381,16 @@ define([
         return this;
     };
 
-    _prototype_.refreshEditor = function (editorOn) {
-        this.$editor.addClass('show');
-        if (editorOn) {
-            this.$editor.addClass(this.ON);
-            this.$editorBg.addClass(this.ON);
-            this.$editor.css('top', '');
+    _prototype_.refreshDropbox = function ($dom, dropboxOn) {
+        $dom.addClass('show');
+        if (dropboxOn) {
+            $dom.addClass(this.ON);
+            this.$dropboxBg.addClass(this.ON);
+            $dom.css('top', '');
         } else {
-            this.$editor.removeClass(this.ON);
-            this.$editorBg.removeClass(this.ON);
-            this.$editor.css('top', '-' + (this.$editor.height() + this.CORNER_PADDING) + 'px');
+            $dom.removeClass(this.ON);
+            this.$dropboxBg.removeClass(this.ON);
+            $dom.css('top', '-' + ($dom.height() + this.CORNER_PADDING) + 'px');
         }
         return this;
     };
@@ -414,7 +451,19 @@ define([
     _prototype_.onToggleEditor = function (onOpen) {
         this.EDITOR_ON = !!onOpen;
         this.$editor.addClass('animate');
-        this.refreshEditor(this.EDITOR_ON);
+        this.refreshDropbox(this.$editor, this.EDITOR_ON);
+    };
+
+    _prototype_.onShowAbout = function () {
+        this.ABOUT_ON = true;
+        this.$about.addClass('animate');
+        this.refreshDropbox(this.$about, this.ABOUT_ON);
+    };
+
+    _prototype_.onShowHelp = function () {
+        this.HELP_ON = true;
+        this.$help.addClass('animate');
+        this.refreshDropbox(this.$help, this.HELP_ON);
     };
 
     _prototype_.onEditFunc = function (index) {

@@ -261,6 +261,12 @@ button {
     }
     .menu {
       float: right;
+      a {
+        cursor: pointer;
+        &:hover {
+          color: #666;
+        }
+      }
     }
     &:after {
       .clear();
@@ -271,8 +277,8 @@ button {
     padding: 0;
     margin: 0;
     font-size: 12px;
+    overflow: auto;
     li {
-      height: 100%;
       border-bottom: solid #999 1px;
       position: relative;
       .col1 {
@@ -384,7 +390,7 @@ button {
   }
 }
 
-#func-editor-bg {
+#dropbox-bg {
   position: absolute;
   width: 100%;
   height: 100%;
@@ -396,13 +402,13 @@ button {
   }
 }
 
-#func-editor-wrap {
+.dropbox-wrap {
   position: relative;
   margin: 0 auto;
   width: 340px;
 }
 
-#func-editor {
+.dropbox {
   .transition(all .1s);
   position: absolute;
   background: #eeeeee;
@@ -450,7 +456,7 @@ button {
       float: left;
       line-height: 16px;
     }
-    #close-func-editor-btn {
+    .close-dropbox-btn {
       float: right;
       .sprite-position(@cross);
       &:hover {
@@ -461,6 +467,21 @@ button {
       .clear();
     }
   }
+  .dropbox-inner {
+    padding: 10px 20px 20px 20px;
+    h3 {
+      font-size: 13px;
+      margin: 10px 0;
+    }
+    p {
+      font-size: 12px;
+      line-height: 18px;
+      margin: 5px 0;
+    }
+  }
+}
+
+#func-editor {
   #func-textarea-wrap {
     padding: 10px 32px 10px 20px;
     textarea {
