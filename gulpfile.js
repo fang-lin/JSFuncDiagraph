@@ -18,7 +18,7 @@ var gulp = require('gulp'),
     rename = require('gulp-rename'),
     copy2 = require('gulp-copy2'),
     path = require('path'),
-    //sprite = require('css-sprite').stream,
+    sprite = require('css-sprite').stream,
     gulpIf = require('gulp-if');
 
 // region lint
@@ -46,7 +46,7 @@ gulp.task('less', function () {
         .pipe(gulp.dest('client/css/'));
 });
 
-gulp.task('bower-less', ['bower'], function () {
+gulp.task('less:bower', ['bower'], function () {
     return gulp.src('client/css/main.less')
         .pipe(less())
         .on('error', function (err) {
@@ -99,7 +99,15 @@ gulp.task('sprites', function () {
 
 // region minify-css
 
-gulp.task('minify-css', ['bower-less'], function () {
+gulp.task('css', ['less:bower'], function () {
+    return gulp.src('client/css/main.css')
+        //.pipe(minifyCss({
+        //    keepSpecialComments: 0
+        //}))
+        .pipe(gulp.dest('dist/css/'));
+});
+
+gulp.task('css:minify', ['less:bower'], function () {
     return gulp.src('client/css/main.css')
         .pipe(minifyCss({
             keepSpecialComments: 0
@@ -146,7 +154,17 @@ gulp.task('compress:app', ['bower'], function () {
         .pipe(gulp.dest('dist'));
 });
 
-gulp.task('compress', ['compress:requirejs', 'compress:app']);
+gulp.task('concat:app', ['bower'], function () {
+    return gulp.src('client/*').
+        pipe(amdOptimize('init', {
+            baseUrl: 'client/',
+            configFile: 'client/build-config.js'
+        }))
+        .pipe(concat('init.js'))
+        .pipe(gulp.dest('dist'));
+});
+
+gulp.task('compress-all', ['compress:requirejs', 'compress:app']);
 
 // endregion compress
 // region copy
@@ -159,11 +177,19 @@ gulp.task('copy', ['clean'], function () {
     ]);
 });
 
+gulp.task('copy:requirejs', ['clean'], function () {
+    return copy2([
+        {src: 'client/lib/requirejs/require.js', dest: 'dist/lib/requirejs/'}
+    ]);
+});
+
 // endregion copy
 // region integration
 
 gulp.task('develop', ['nodemon', 'watch', 'git-hook']);
 
-gulp.task('build', ['copy', 'minify-css', 'compress']);
+gulp.task('build:without-compress', ['copy', 'css', 'concat:app', 'copy:requirejs']);
+
+gulp.task('build', ['copy', 'css:minify', 'compress-all']);
 
 // endregion integration

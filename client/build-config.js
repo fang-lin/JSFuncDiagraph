@@ -14,6 +14,7 @@ requirejs.config({
         'backbone': 'lib/backbone/backbone',
         // Apps
         'app': 'app/app',
+        'example': 'app/example',
         'Diagraph': 'app/Diagraph',
         'Expression': 'app/Expression',
         'Palette': 'app/Palette',

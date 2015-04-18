@@ -5,12 +5,13 @@
 
 define([
     'Diagraph',
+    'example',
     'Palette',
     'Expression',
     'parser',
     'backbone',
     'jquery.mousewheel'
-], function (Diagraph, Palette, Expression, parser) {
+], function (Diagraph, example, Palette, Expression, parser) {
     'use strict';
 
     function App() {
@@ -34,17 +35,8 @@ define([
         this.OFF = 'off';
         this.STATE_ON = '+';
         this.STATE_OFF = '-';
-        this.EXPRESSIONS = [
-            ['x=4*cos(2*q)*cos(q);y=4*cos(2*q)*sin(q);q=[0,2*PI]', 'f33'],
-            ['x=q*cos(q);y=q*sin(q);q=[-2.5*PI,2.5*PI]', '3f3'],
-            ['x=4*(sin(2*q)+0.2*sin(100*q))*cos(q);y=4*(sin(2*q)+0.2*sin(100*q))*sin(q);q=[0,2*PI]', '33f'],
-            ['x=4*cos(8*q)*cos(q);y=4*cos(8*q)*sin(q);q=[0,2*PI]', 'f93'],
-            ['x=q*cos(q);y=q*sin(q);q=[0,10*PI]', '09f'],
-            ['x=3*cos(3*q)*cos(q+2);y=3*cos(3*q)*sin(q+2);q=[0,2*PI]', 'f3f'],
-            ['x=2*(sin(q)-0.5*sin(2*q));y=2*sin(q);q=[0,2*PI]', 'f63'],
-            ['x=2*(cos(q)-0.5*cos(2*q));y=2*(sin(q)-0.5*sin(2*q));q=[0,2*PI]', '6f9']
-        ];
-        //this.EXPRESSIONS = [];
+        this.EXPRESSIONS = example.getRandomExp();
+        //this.EXPRESSIONS = example.getAllExps();
 
         this.$window = $(window);
         this.$body = $('body');
@@ -584,5 +576,7 @@ define([
         return [x, y];
     };
 
-    var app = new App();
+    $(function () {
+        var app = new App();
+    });
 });
