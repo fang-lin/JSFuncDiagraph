@@ -10,15 +10,12 @@ var gulp = require('gulp'),
     del = require('del'),
     jshint = require('gulp-jshint'),
     nodemon = require('gulp-nodemon'),
-    buster = require('gulp-buster'),
     less = require('gulp-less'),
     minifyCss = require('gulp-minify-css'),
     uglify = require('gulp-uglify'),
     amdOptimize = require('amd-optimize'),
     rename = require('gulp-rename'),
     copy2 = require('gulp-copy2'),
-    path = require('path'),
-    sprite = require('css-sprite').stream,
     gulpIf = require('gulp-if');
 
 // region lint
@@ -87,6 +84,7 @@ gulp.task('bower', ['clean'], function (done) {
 // endregion bower
 
 gulp.task('sprites', function () {
+    var sprite = require('css-sprite').stream;
     return gulp.src('./client/img/slice/*.png')
         .pipe(sprite({
             name: 'buttons',

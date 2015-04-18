@@ -25,8 +25,7 @@
     "gulp-rename": "^1.2.2",
     "gulp-uglify": "^1.1.0",
     "gulp-util": "^3.0.4",
-    "jshint-stylish": "^1.0.1",
-    "css-sprite": "^0.9.8"
+    "jshint-stylish": "^1.0.1"
   },
   "repository": {
     "type": "git",
@@ -43,5 +42,8 @@
     "mathematics"
   ],
   "author": "Justinc Fang",
-  "license": "ISC"
+  "license": "ISC",
+  "devDependencies": {
+    "css-sprite": "^0.9.8"
+  }
 }
