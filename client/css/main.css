@@ -188,6 +188,9 @@ button {
   margin: 0;
   padding: 0 0 10px 0;
 }
+#tl-panel h1 #drawing-state {
+  color: #f33;
+}
 #tl-panel h1 a {
   text-decoration: none;
   color: #000;
