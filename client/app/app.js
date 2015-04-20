@@ -574,10 +574,10 @@ define([
         var x = origin[0] - size[0] / 2;
         var y = origin[1] - size[1] / 2;
 
-        if (Number.isNaN(x) || typeof x !== 'number') {
+        if (_.isNaN(x) || typeof x !== 'number') {
             x = 0;
         }
-        if (Number.isNaN(y) || typeof y !== 'number') {
+        if (_.isNaN(y) || typeof y !== 'number') {
             y = 0;
         }
 
