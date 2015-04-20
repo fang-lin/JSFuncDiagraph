@@ -3,7 +3,7 @@
  * Author: isaac.fang@grapecity.com
  */
 
-define([], function () {
+define(function () {
     'use strict';
 
     function Expression(literal, color, hide) {
@@ -28,9 +28,9 @@ define([], function () {
         'Math.sin': 'sin',
         'Math.cos': 'cos',
         'Math.tan': 'tan',
-        'Math.asin': 'arcs',
-        'Math.acos': 'arcc',
-        'Math.atan': 'arct',
+        'Math.asin': 'arcsin',
+        'Math.acos': 'arccos',
+        'Math.atan': 'arctan',
         'Math.PI': 'PI',
         'Math.E': 'E'
     };

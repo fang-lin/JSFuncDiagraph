@@ -41,7 +41,7 @@ define([
     Diagraph.MAX_VALUE = 1e100;
     Diagraph.CHORD_FIELD = [0.9, 1.1];
     Diagraph.MAX_ITERATION = 4294967296;
-    Diagraph.MAX_DELTA_RECOUNT = 16;
+    Diagraph.MAX_DELTA_RECOUNT = 32;
     Diagraph.STATE_ON = '+';
     Diagraph.STATE_OFF = '-';
 
