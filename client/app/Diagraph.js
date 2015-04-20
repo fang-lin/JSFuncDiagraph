@@ -233,7 +233,7 @@ define([
 
         var iterationCount = 0,
             overflow = false,
-            tx;
+            tx = NaN;
 
         function computeDx() {
             var deltaRecount = 0,
@@ -276,6 +276,7 @@ define([
                 if (!overflow && dx < 0) {
                     // draw to negative direction
                     x = tx;
+                    y = func(x);
                     dx = MAX_DELTA;
                     computeDx();
                     overflow = false;
@@ -292,15 +293,16 @@ define([
                 if (overflow) {
                     // enter range first, reverse dx
                     dx = -MAX_DELTA;
+                    // temporary recording x to tx
                     tx = x;
                 }
                 overflow = false;
 
-                computeDx();
-
                 px = offset[0] + x * zoom;
                 py = offset[1] - y * zoom;
                 coords.push(SMOOTH ? [px, py] : [Math.round(px), Math.round(py)]);
+
+                computeDx();
 
                 x += dx;
                 y = func(x);

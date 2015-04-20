@@ -169,7 +169,7 @@ define([
                 self.refreshSize().adjustFuncListHeight();
                 self.diagraph.redraw(self.SIZE);
             }, 800))
-            .on('mousemove.crossCursor', function (event) {
+            .on('mousemove.crossCursor', function () {
                 self.onMouseMoveCrossCursor();
             })
             .on('mousedown', function (event) {
@@ -190,7 +190,7 @@ define([
             })
             .on('mousewheel', function (event) {
                 event.stopPropagation();
-                self.onZoom(event.deltaY * event.deltaFactor / self.WHEEL_DAMP);
+                self.onZoom(event.deltaY * event.deltaFactor / self.WHEEL_DAMP, [event.clientX, event.clientY]);
                 self.onMouseMoveCrossCursor();
             });
 
@@ -202,12 +202,12 @@ define([
 
         this.$zoomInBtn.on('click', function (event) {
             event.stopPropagation();
-            self.onZoom(1, true);
+            self.onZoom(1, null, true);
         });
 
         this.$zoomOutBtn.on('click', function (event) {
             event.stopPropagation();
-            self.onZoom(-1, true);
+            self.onZoom(-1, null, true);
         });
 
         this.$smoothBtn.on('click', function (event) {
@@ -273,7 +273,7 @@ define([
                 });
         });
 
-        this.$submitBtn.on('click', function (event) {
+        this.$submitBtn.on('click', function () {
 
             var expr = new Expression(self.$funcTextarea.val(), self.palette.selectedColor);
 
@@ -422,19 +422,19 @@ define([
         }
     };
 
-    _prototype_.onZoom = function (delta, immed) {
+    _prototype_.onZoom = function (delta, origin, immed) {
         var _delta = delta > 0 ? 1 : -1;
 
         if (immed) {
             this.DELTA_SUM = 0;
             this.ZOOM_LEVEL += _delta;
-            this.refreshDiagraphZoom(_delta);
+            this.refreshDiagraphZoom(_delta, origin);
         } else {
             this.DELTA_SUM += delta;
             if (Math.abs(this.DELTA_SUM) >= 1) {
                 this.DELTA_SUM = 0;
                 this.ZOOM_LEVEL += _delta;
-                this.refreshDiagraphZoom(_delta);
+                this.refreshDiagraphZoom(_delta, origin);
             }
         }
         return this;
@@ -499,12 +499,28 @@ define([
         }
     };
 
-    _prototype_.refreshDiagraphZoom = function (delta) {
+    _prototype_.refreshDiagraphZoom = function (delta, center) {
         var zoom = this.parseZoom(this.ZOOM_LEVEL);
+        var _zoom = this.diagraph.zoom();
         this.diagraph.zoom(zoom);
 
         if (this.diagraph.zoom() === zoom) {
-            this.diagraph.redraw();
+
+            var origin = this.diagraph.origin();
+            var x, y;
+            var k = zoom / _zoom;
+
+            if (center) {
+                x = center[0] - (center[0] - origin[0]) * k;
+                y = center[1] - (center[1] - origin[1]) * k;
+            } else {
+                var size = this.diagraph.size();
+                var _center = [size[0] / 2, size[1] / 2];
+
+                x = _center[0] - (_center[0] - origin[0]) * k;
+                y = _center[1] - (_center[1] - origin[1]) * k;
+            }
+            this.diagraph.origin([x, y]).redraw();
             this.refreshZoomLevel(this.ZOOM_LEVEL);
             this.refreshState({zoom: this.ZOOM_LEVEL});
         } else {
@@ -566,17 +582,16 @@ define([
         var x = origin[0] - size[0] / 2;
         var y = origin[1] - size[1] / 2;
 
-        if (_.isNaN(x) || typeof x !== 'number') {
+        if (isNaN(x) || typeof x !== 'number') {
             x = 0;
         }
-        if (_.isNaN(y) || typeof y !== 'number') {
+        if (isNaN(y) || typeof y !== 'number') {
             y = 0;
         }
-
-        return [x, y];
+        return [Math.round(x), Math.round(y)];
     };
 
     $(function () {
-        var app = new App();
+        new App();
     });
 });
