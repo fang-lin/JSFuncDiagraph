@@ -28,13 +28,15 @@ button {
 }
 #tl-panel,
 #bl-panel,
-#br-panel {
+#br-panel,
+#copyright {
   position: absolute;
   z-index: 10;
 }
 #tl-panel button,
 #bl-panel button,
-#br-panel button {
+#br-panel button,
+#copyright button {
   background-image: url('../img/buttons.png');
   font-size: 0;
   line-height: 0;
@@ -44,7 +46,8 @@ button {
 }
 #tl-panel:after,
 #bl-panel:after,
-#br-panel:after {
+#br-panel:after,
+#copyright:after {
   content: ' ';
   display: block;
   height: 0;
@@ -75,6 +78,12 @@ button {
 }
 #bl-panel button {
   margin-right: 5px;
+}
+#copyright {
+  right: 20px;
+  bottom: 4px;
+  font-size: 11px;
+  color: #666;
 }
 #centered-btn {
   background-position: -4px -696px;
@@ -179,6 +188,13 @@ button {
   margin: 0;
   padding: 0 0 10px 0;
 }
+#tl-panel h1 a {
+  text-decoration: none;
+  color: #000;
+}
+#tl-panel h1 a:hover {
+  color: #666;
+}
 #canvas {
   background: #ffffff;
   width: 100%;
@@ -222,7 +238,7 @@ button {
   height: 1px;
 }
 #dashboard {
-  background: #eeeeee;
+  background: #eee;
   position: absolute;
   overflow: hidden;
   z-index: 10;
@@ -232,7 +248,7 @@ button {
   right: -9999px;
   cursor: default;
   border-style: solid;
-  border-color: #666666;
+  border-color: #666;
   border-width: 0 0 1px 1px;
   -webkit-border-top-right-radius: 0;
   -webkit-border-bottom-right-radius: 0;
@@ -265,7 +281,7 @@ button {
   margin: 10px 0 0 0;
   font-size: 12px;
   padding: 10px 20px;
-  background: #cccccc;
+  background: #ccc;
 }
 #dashboard h2 .title {
   float: left;
@@ -442,7 +458,7 @@ button {
   -ms-transition: all 0.1s;
   -o-transition: all 0.1s;
   position: absolute;
-  background: #eeeeee;
+  background: #eee;
   margin: 0 auto;
   z-index: 20;
   cursor: default;
@@ -451,7 +467,7 @@ button {
   left: 0;
   right: 0;
   border-style: solid;
-  border-color: #666666;
+  border-color: #666;
   border-width: 0 1px 1px 1px;
   -webkit-border-top-right-radius: 0;
   -webkit-border-bottom-right-radius: 4px;
@@ -583,10 +599,10 @@ button {
   border-style: solid;
 }
 #func-editor #footer #palette a.selected {
-  border-color: #ffffff !important;
+  border-color: #fff !important;
 }
 #func-editor #footer #palette a.bright.selected {
-  border-color: #000000 !important;
+  border-color: #000 !important;
 }
 #func-editor #footer #palette:after {
   content: ' ';

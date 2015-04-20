@@ -39,6 +39,7 @@ gulp.task('less', function () {
         .pipe(less())
         .on('error', function (err) {
             util.log(util.colors.red(err));
+            this.emit('end');
         })
         .pipe(gulp.dest('client/css/'));
 });

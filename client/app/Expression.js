@@ -18,32 +18,35 @@ define(function () {
     Expression.STATE_ON = '+';
     Expression.STATE_OFF = '-';
 
-    Expression.MATH_FUNC = {
-        'Math.abs': 'abs',
-        'Math.floor': 'floor',
-        'Math.ceil': 'ceil',
-        'Math.round': 'round',
-        'Math.pow': 'pow',
-        'Math.log': 'log',
-        'Math.sin': 'sin',
-        'Math.cos': 'cos',
-        'Math.tan': 'tan',
-        'Math.asin': 'arcsin',
-        'Math.acos': 'arccos',
-        'Math.atan': 'arctan',
-        'Math.PI': 'PI',
-        'Math.E': 'E'
-    };
+    Expression.MATH_FUNC = [
+        ['Math.abs', 'abs'],
+        ['Math.floor', 'floor'],
+        ['Math.ceil', 'ceil'],
+        ['Math.round', 'round'],
+        ['Math.pow', 'pow'],
+        ['Math.log', 'log'],
+        ['a@r@c@s@i@n', 'arcsin'],
+        ['a@r@c@c@o@s', 'arccos'],
+        ['a@r@c@t@a@n', 'arctan'],
+        ['Math.sin', 'sin'],
+        ['Math.cos', 'cos'],
+        ['Math.tan', 'tan'],
+        ['Math.asin', 'a@r@c@s@i@n'],
+        ['Math.acos', 'a@r@c@c@o@s'],
+        ['Math.atan', 'a@r@c@t@a@n'],
+        ['Math.PI', 'PI'],
+        ['Math.E', 'E']
+    ];
 
-    Expression.OPTS = {
-        '=': ' = ',
-        ',': ', '
-        //'\\+': ' + ',
-        //'-': ' - ',
-        //'\\*': ' * ',
-        //'\\/': ' / ',
-        //'%': ' % '
-    };
+    Expression.OPTS = [
+        ['=', ' = '],
+        [',', ', ']
+        //['\\+', ' + '],
+        //['-', ' - '],
+        //['\\*', ' * '],
+        //['\\/', ' / '],
+        //['%', ' % ']
+    ];
 
     Expression.VAR_X = 'x';
     Expression.VAR_Q = 'q';
@@ -143,27 +146,21 @@ define(function () {
 
     _prototype_.calibrate = function (literal) {
         var MATH_FUNC = Expression.MATH_FUNC;
-        for (var func in MATH_FUNC) {
-            if (MATH_FUNC.hasOwnProperty(func)) {
-                literal = literal.replace(eval('/' + MATH_FUNC[func] + '/g'), func);
-            }
-        }
+        MATH_FUNC.forEach(function (func) {
+            literal = literal.replace(new RegExp(func[1], 'g'), func[0]);
+        });
         return literal;
     };
 
     _prototype_.format = function (literal) {
         var OPTS = Expression.OPTS;
         var MATH_FUNC = Expression.MATH_FUNC;
-        for (var opt in OPTS) {
-            if (OPTS.hasOwnProperty(opt)) {
-                literal = literal.replace(new RegExp(opt, 'g'), OPTS[opt]);
-            }
-        }
-        for (var func in MATH_FUNC) {
-            if (MATH_FUNC.hasOwnProperty(func)) {
-                literal = literal.replace(new RegExp(func, 'g'), MATH_FUNC[func]);
-            }
-        }
+        OPTS.forEach(function (opt) {
+            literal = literal.replace(new RegExp(opt[0], 'g'), opt[1]);
+        });
+        MATH_FUNC.reverse().forEach(function (func) {
+            literal = literal.replace(new RegExp(func[0], 'g'), func[1]);
+        });
         return literal;
     };
 
