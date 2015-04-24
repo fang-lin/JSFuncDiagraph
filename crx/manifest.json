@@ -1,0 +1,19 @@
+{
+  "manifest_version": 2,
+  "name": "JSFuncDiagraph",
+  "description": "A mathematical function diagraph written by javascript",
+  "version": "2.2.3",
+  "icons": {
+    "16": "icon-16.png",
+    "48": "icon-48.png",
+    "128": "icon-128.png"
+  },
+  "app": {
+    "urls": [
+      "http://js-func-diagraph.fanglin.name/"
+    ],
+    "launch": {
+      "web_url": "http://js-func-diagraph.fanglin.name/"
+    }
+  }
+}
