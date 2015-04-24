@@ -1,8 +1,8 @@
 {
   "name": "JSFuncDiagraph",
-  "version": "2.2.3",
+  "version": "2.2.4",
   "authors": [
-    "IsaacFang <isaac.fang@grapecity.com>"
+    "Fanglin <me@fanglin.name>"
   ],
   "description": "JSFuncDiagraph is a mathematical function diagraph written by javascript.",
   "license": "MIT",

@@ -164,6 +164,18 @@ define([
             event.stopPropagation();
         });
 
+        var dragEvents = {
+            start: 'mousedown',
+            move: 'mousemove',
+            end: 'mouseup'
+        };
+
+        dragEvents = {
+            start: 'touchstart',
+            move: 'touchmove',
+            end: 'touchend'
+        };
+
         this.$window
             .on('resize', _.throttle(function () {
                 self.refreshSize().adjustFuncListHeight();
@@ -172,26 +184,26 @@ define([
             .on('mousemove.crossCursor', function () {
                 self.onMouseMoveCrossCursor();
             })
-            .on('mousedown', function (event) {
-                event.stopPropagation();
-                self.onDragStart(event);
-                self.$window.on('mousemove.drag', function (event) {
-                    self.onDragging(event);
-                });
-                self.$window.off('mousemove.crossCursor');
-            })
-            .on('mouseup', function (event) {
-                event.stopPropagation();
-                self.$window.off('mousemove.drag');
-                self.$window.on('mousemove.crossCursor', function () {
-                    self.onMouseMoveCrossCursor();
-                });
-                self.onDragEnd(event);
-            })
             .on('mousewheel', function (event) {
                 event.stopPropagation();
                 self.onZoom(event.deltaY * event.deltaFactor / self.WHEEL_DAMP, [event.clientX, event.clientY]);
                 self.onMouseMoveCrossCursor();
+            })
+            .on(dragEvents.start, function (event) {
+                event.stopPropagation();
+                self.onDragStart(event);
+                self.$window.on(dragEvents.move + '.drag', function (event) {
+                    self.onDragging(event);
+                });
+                self.$window.off('mousemove.crossCursor');
+            })
+            .on(dragEvents.end, function (event) {
+                event.stopPropagation();
+                self.$window.off(dragEvents.move + '.drag');
+                self.$window.on('mousemove.crossCursor', function () {
+                    self.onMouseMoveCrossCursor();
+                });
+                self.onDragEnd(event);
             });
 
         this.$centeredBtn.on('click', function (event) {
@@ -389,7 +401,7 @@ define([
 
     _prototype_.onDragStart = function (event) {
         this.$body.addClass('drag-start');
-        this.drag.client = [event.clientX, event.clientY];
+        this.drag.client = this.clientXY(event);
         this.drag.origin = this.diagraph.origin();
         this.$lineX.css('left', '9999px');
         this.$lineY.css('top', '9999px');
@@ -397,14 +409,14 @@ define([
 
     _prototype_.onDragging = function (event) {
         this.$body.removeClass('drag-start').addClass('dragging');
-        this.$canvas.css('transform', 'translate(' + (event.clientX - this.drag.client[0]) + 'px,' + (event.clientY - this.drag.client[1]) + 'px)');
+        this.$canvas.css('transform', 'translate(' + (this.clientXY(event)[0] - this.drag.client[0]) + 'px,' + (this.clientXY(event)[1] - this.drag.client[1]) + 'px)');
     };
 
     _prototype_.onDragEnd = function (event) {
         this.$body.removeClass('drag-start').removeClass('dragging');
         var offset = [
-            this.drag.origin[0] + event.clientX - this.drag.client[0],
-            this.drag.origin[1] + event.clientY - this.drag.client[1]
+            this.drag.origin[0] + this.clientXY(event)[0] - this.drag.client[0],
+            this.drag.origin[1] + this.clientXY(event)[1] - this.drag.client[1]
         ];
         this.$canvas.css('transform', 'translate(0,0)');
         this.diagraph.redraw(false, offset);
@@ -589,6 +601,25 @@ define([
             y = 0;
         }
         return [Math.round(x), Math.round(y)];
+    };
+
+    _prototype_.clientXY = function (event) {
+        if (event.type === 'touchstart' || event.type === 'touchmove') {
+            return [
+                event.originalEvent.changedTouches[0].clientX,
+                event.originalEvent.changedTouches[0].clientY
+            ];
+        } else if (event.type === 'touchend') {
+            return [
+                event.originalEvent.changedTouches[0].clientX,
+                event.originalEvent.changedTouches[0].clientY
+            ];
+        } else {
+            return [
+                event.clientX,
+                event.clientY
+            ];
+        }
     };
 
     $(function () {

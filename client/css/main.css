@@ -12,6 +12,7 @@ body {
   overflow: hidden;
   cursor: crosshair;
   font-family: consolas courier, monospace;
+  position: fixed;
 }
 body.drag-start,
 body.dragging {
@@ -25,6 +26,11 @@ button {
   background-color: transparent;
   border: medium none;
   outline: medium none;
+}
+#console {
+  position: absolute;
+  font-size: 12px;
+  z-index: 9999;
 }
 #tl-panel,
 #bl-panel,
@@ -247,6 +253,7 @@ button {
   z-index: 10;
   visibility: hidden;
   width: 340px;
+  max-width: 90%;
   top: -9999px;
   right: -9999px;
   cursor: default;
@@ -454,6 +461,7 @@ button {
   position: relative;
   margin: 0 auto;
   width: 340px;
+  max-width: 90%;
 }
 .dropbox {
   -webkit-transition: all 0.1s;
