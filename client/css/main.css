@@ -91,6 +91,13 @@ button {
   font-size: 11px;
   color: #666;
 }
+#copyright a {
+  text-decoration: none;
+  color: #666;
+}
+#copyright a:hover {
+  color: #999;
+}
 #centered-btn {
   background-position: -4px -696px;
 }
