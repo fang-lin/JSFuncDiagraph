@@ -21,6 +21,7 @@
     "underscore": "~1.7.0",
     "catiline": "~2.9.3",
     "backbone": "~1.1.2",
-    "lz-string": "~1.4.1"
+    "lz-string": "~1.4.1",
+    "jquery.browser": "~0.0.7"
   }
 }

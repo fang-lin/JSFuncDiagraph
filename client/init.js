@@ -8,6 +8,7 @@ requirejs.config({
         // Libs
         'jquery': 'lib/jquery/dist/jquery',
         'jquery.mousewheel': 'lib/jquery-mousewheel/jquery.mousewheel',
+        'jquery.browser': 'lib/jquery.browser/dist/jquery.browser',
         'underscore': 'lib/underscore/underscore',
         'lz-string': 'lib/lz-string/libs/lz-string',
         'catiline': 'lib/catiline/dist/catiline',
@@ -22,6 +23,9 @@ requirejs.config({
     },
     shim: {
         'jquery.mousewheel': {
+            deps: ['jquery']
+        },
+        'jquery.browser': {
             deps: ['jquery']
         },
         'backbone': {

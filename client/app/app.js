@@ -10,7 +10,8 @@ define([
     'Expression',
     'parser',
     'backbone',
-    'jquery.mousewheel'
+    'jquery.mousewheel',
+    'jquery.browser'
 ], function (Diagraph, example, Palette, Expression, parser) {
     'use strict';
 
@@ -170,11 +171,13 @@ define([
             end: 'mouseup'
         };
 
-        dragEvents = {
-            start: 'touchstart',
-            move: 'touchmove',
-            end: 'touchend'
-        };
+        if ($.browser.mobile) {
+            dragEvents = {
+                start: 'touchstart',
+                move: 'touchmove',
+                end: 'touchend'
+            };
+        }
 
         this.$window
             .on('resize', _.throttle(function () {
