@@ -8,6 +8,7 @@ requirejs.config({
         // Libs
         'jquery': 'lib/jquery/dist/jquery.min',
         'jquery.mousewheel': 'lib/jquery-mousewheel/jquery.mousewheel.min',
+        'jquery.browser': 'lib/jquery.browser/dist/jquery.browser.min',
         'underscore': 'lib/underscore/underscore-min',
         'lz-string': 'lib/lz-string/libs/lz-string.min',
         'catiline': 'lib/catiline/dist/catiline.min',
