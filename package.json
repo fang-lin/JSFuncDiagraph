@@ -1,7 +1,7 @@
 {
-  "name": "JSFuncDiagraph",
-  "version": "2.2.4",
-  "description": "JSFuncDiagraph is a mathematical function diagraph written by javascript.",
+  "name": "FuncDiagraph",
+  "version": "2.2.5",
+  "description": "FuncDiagraph is a mathematical function diagraph written by javascript.",
   "main": "index.js",
   "dependencies": {
     "amd-optimize": "^0.4.3",

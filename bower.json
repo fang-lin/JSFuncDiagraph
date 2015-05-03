@@ -1,10 +1,10 @@
 {
-  "name": "JSFuncDiagraph",
-  "version": "2.2.4",
+  "name": "FuncDiagraph",
+  "version": "2.2.5",
   "authors": [
     "Fanglin <me@fanglin.name>"
   ],
-  "description": "JSFuncDiagraph is a mathematical function diagraph written by javascript.",
+  "description": "FuncDiagraph is a mathematical function diagraph written by javascript.",
   "license": "MIT",
   "ignore": [
     "**/.*",
